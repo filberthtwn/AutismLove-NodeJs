@@ -1,0 +1,81 @@
+extends /layout_dashboard
+
+block dashboard-content
+  div(class="w-full bg-white rounded-2xl p-9")
+    div(class="flex justify-between mb-6")
+      input(id="search-input" class="form-control border rounded-full px-4" type="text" placeholder=strings.SEARCH())
+      a(class="btn btn-excel px-5" href=url + '/download-excel')
+        div(class="flex")
+          img(class="mr-4" src="/assets/img/front-end/ic_excel.svg")
+          p=strings.EXCEL_DOWNLOAD()
+    table(class="table table-auto w-full")
+      thead(class="border-b border-gray-200")
+        tr
+          th
+            button(class="sort-btn" data-name="created_at" data-sort="DESC")
+              div(class='flex space-x-2')
+                p(class="my-auto font-bold")=strings.CREATED_AT()
+                div(class="sort-d my-auto")
+                  img(class="sort-up-img sort-img active" src="/assets/img/front-end/ic_sort_up.svg" alt="" style="width: 10px; height: 10px;") 
+                  img(class="sort-down-img sort-img hidden" src="/assets/img/front-end/ic_sort_down.svg" alt="" style="width: 10px; height: 10px;")
+          th
+            button(class="sort-btn" data-name="email" data-sort="ASC")
+              div(class='flex space-x-2')
+                p(class="my-auto font-bold")=strings.ID()
+                div(class="sort-d my-auto")
+                  img(class="sort-up-img sort-img" src="/assets/img/front-end/ic_sort_up.svg" alt="" style="width: 10px; height: 10px;") 
+                  img(class="sort-down-img sort-img hidden" src="/assets/img/front-end/ic_sort_down.svg" alt="" style="width: 10px; height: 10px;")
+          th
+            button(class="sort-btn" data-name="name" data-sort="ASC")
+              div(class='flex space-x-2')
+                p(class="my-auto font-bold")=strings.NAME()
+                div(class="sort-d my-auto")
+                  img(class="sort-up-img sort-img" src="/assets/img/front-end/ic_sort_up.svg" alt="" style="width: 10px; height: 10px;") 
+                  img(class="sort-down-img sort-img hidden" src="/assets/img/front-end/ic_sort_down.svg" alt="" style="width: 10px; height: 10px;")
+          th
+            button(class="sort-btn" data-name="name" data-sort="ASC")
+              div(class='flex space-x-2')
+                p(class="my-auto font-bold")=strings.PHONE_NUMBER()
+                div(class="sort-d my-auto")
+                  img(class="sort-up-img sort-img" src="/assets/img/front-end/ic_sort_up.svg" alt="" style="width: 10px; height: 10px;") 
+                  img(class="sort-down-img sort-img hidden" src="/assets/img/front-end/ic_sort_down.svg" alt="" style="width: 10px; height: 10px;")
+          th=strings.ANTICANCER_MED_TYPE()
+          th=strings.ANTICANCER_ROUTE_NAME()
+          th=strings.ACTION()
+      tbody(id="body-list")
+        each user in users
+          - const lastInjectionRoute = user.injection_routes[user.injection_routes.length-1];
+          tr 
+            td=moment(user.created_at).format('YYYY-MM-DD')
+            td= user.email
+            td= user.name
+            td= user.phone_number
+            td= user.anticancer_med.name
+            td
+              
+              - if(lastInjectionRoute && lastInjectionRoute.side_effect_records.length > 0 && lastInjectionRoute.side_effect_records[0].survey_records.length > 0)
+                  = lastInjectionRoute.anticancer_med_design_element.name + ' ' + lastInjectionRoute.side_effect_records[0].survey_records[0].week + '주차'
+              - else
+                  = '-'
+            td
+              a(class="action btn-primary" href="data-management/" + user.id + "/route")=strings.DETAILS()
+
+  div(id="pagination")!=pagination
+
+block js-script
+    script.
+      var url = !{JSON.stringify(url)};
+      const limit = !{JSON.stringify(limit)};
+      const totalCount = !{JSON.stringify(total_count)};
+      sortQuery = ['created_at', 'DESC'];
+
+      initializeSearch(url, $('#search-input'), $('#body-list'), refreshData);
+      initializePagination(url, totalCount, limit, refreshData);
+      initializeSorting(url, refreshData);
+
+      function refreshData(response){
+        $('#pagination').html(response.data.pagination);
+        initializePagination(url, totalCount, limit, refreshData);
+        
+        $('#body-list').html(response.data.data_items);
+      }

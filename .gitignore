@@ -1,0 +1,6 @@
+/node_modules/
+npm-debug.log
+npm-shrinkwrap.json
+
+/public/assets/img/side_effect_record
+# /assets/img/side_effect_record/

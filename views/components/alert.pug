@@ -1,0 +1,4 @@
+mixin alert(response)
+    if response[0]
+        div(class="text-white rounded-xl px-6 py-5 mb-8" class=(response[0].status ? "bg-success" : "bg-danger"))
+            p= response[0].message

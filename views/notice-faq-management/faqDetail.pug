@@ -1,0 +1,42 @@
+extends /layout_dashboard
+
+block dashboard-content
+    div(class="relative w-full mb-8")
+        div(class="flex")
+            a(class="btn btn-back mr-4" href="/notice-faq-management/faq")
+                img(src="/assets/img/front-end/ic_back.svg", alt="")
+            p(class="my-auto")=strings.FAQ_MANAGEMENT()
+        p(class="font-bold my-auto centered-axis-x" style="top:3.5px;")=title
+
+    div(class="w-full bg-white rounded-2xl p-9 mb-8")
+        - const method = url.split("/")[url.split("/").length - 1]
+        if method != 'create'
+            p(class="mb-5") #[span.font-bold=strings.CREATED_AT()]: 
+                =moment(faq.created_at).format('YYYY-MM-DD')
+        form(id="faq-form" action=url + ((method != 'create') ? "?_method=PATCH" : "") method="POST")
+            div(class="mb-4")
+                p(class="mb-2")=strings.QUESTION()
+                input(class="form-control border rounded-xl px-4 w-full" type="text" name="question" value=((faq) ? faq.question : "") required)
+            div
+                p(class="mb-2")=strings.ANSWER()
+                div(class="border rounded-xl p-4 w-full")
+                    textarea(class="w-full" rows="5" type="text" name="answer" required)=((faq) ? faq.answer : "")    
+    div(class="flex w-full")
+        div.ml-auto
+            if url.split("/")[url.split("/").length - 1] != 'create'
+                form(class="inline-block" action=url + "?_method=DELETE"  method="POST")
+                    button(class="btn btn-danger w-36 rounded-full mr-6")=strings.DELETE()
+            button(id="save-btn" class="btn btn-primary w-36 rounded-full" type="submit" form="faq-form" disabled=(faq))=strings.SAVE()
+block js-script
+    script.
+        $('input[type="text"]').on('input', function(){
+            enableSaveBtn();
+        });
+
+        $('textarea').on('input', function(){
+            enableSaveBtn();
+        })
+
+        function enableSaveBtn(){
+            $('#save-btn').attr('disabled', false);
+        }

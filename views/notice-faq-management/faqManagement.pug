@@ -1,0 +1,44 @@
+extends layoutNoticeFaq 
+
+block notice-faq-content
+    div(class="flex w-full mb-8")
+        div.mx-auto
+            a(class="btn btn-primary px-6 rounded-full" href=url + '/create')=strings.CREATE_FAQ()
+
+    div(class="w-full bg-white rounded-2xl p-9 mb-8")
+        table(class="table table-auto w-full")
+            thead(class="border-b border-gray-200")
+                tr
+                    th(style="text-align: center")
+                        button(class="sort-btn" data-name="question" data-sort="ASC")
+                            div(class='flex space-x-2')
+                                p(class="my-auto font-bold")=strings.FAQ_QUESTION()
+                                div(class="sort-d my-auto")
+                                    img(class="sort-up-img sort-img active" src="/assets/img/front-end/ic_sort_up.svg" alt="" style="width: 10px; height: 10px;") 
+                                    img(class="sort-down-img sort-img hidden" src="/assets/img/front-end/ic_sort_down.svg" alt="" style="width: 10px; height: 10px;")
+                    th(style="width: 20%")=strings.ACTION()
+            tbody(id="body-list")
+                    each faq, index in faqs
+                        tr
+                            td(style="text-align: center")=faq.question
+                            td 
+                                a(class="action btn-primary" href=url + '/' + faq.id)=strings.DETAILS()
+
+    div(id="pagination")!=pagination
+
+block js-script
+    script.
+        var url = !{JSON.stringify(url)};
+        const limit = !{JSON.stringify(limit)};
+        const totalCount = !{JSON.stringify(total_count)};
+        sortQuery = ['question', 'DESC'];
+
+        initializePagination(url, totalCount, limit, refreshFAQ);
+        initializeSorting(url, refreshFAQ);
+
+        function refreshFAQ(response){
+            $('#pagination').html(response.data.pagination);
+            initializePagination(url, totalCount, limit, refreshFAQ);
+            
+            $('#body-list').html(response.data.faq_items);
+        }

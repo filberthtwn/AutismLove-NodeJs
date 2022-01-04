@@ -1,0 +1,35 @@
+extends /layout_dashboard
+
+block dashboard-content
+    div(id="popup_d" class="fixed inset-0 z-50 hidden")
+        div(class="absolute inset-0 bg-opacity-50 bg-black")
+        div(id="popup-d-content" class="m-auto bg-white z-50 p-12 rounded-lg overflow-y-auto" style="width: 500px; max-height: 90%;")
+            block popup-content 
+            
+    +alert(response)
+    div(class="flex space-x-5 mb-8")
+        a(href=`/${url.split('/')[1]}/anticancer-med-management`)
+            p(class=(url.split('/')[2] === 'anticancer-med-management') ? "font-bold active" : "")=strings.ANTICANCER_MED()
+            if url.split('/')[2] === 'anticancer-med-management'
+                div(class="h-1 bg-primary rounded-full")
+        a(href=`/${url.split('/')[1]}/survey-management`)
+            p(class=(url.split('/')[2] === 'survey-management') ? "font-bold active" : "")=strings.SURVEY()
+            if url.split('/')[2] === 'survey-management'
+                div(class="h-1 bg-primary rounded-full")
+        a(href=`/${url.split('/')[1]}/side-effect-management`)
+            p(class=(url.split('/')[2] === 'side-effect-management') ? "font-bold active" : "")=strings.SIDE_EFFECT()
+            if url.split('/')[2] === 'side-effect-management'
+                div(class="h-1 bg-primary rounded-full")
+        a(href=`/${url.split('/')[1]}/push-notif-management`)
+            p(class=(url.split('/')[2] === 'push-notif-management') ? "font-bold active" : "")=strings.PUSH_NOTIF()
+            if url.split('/')[2] === 'push-notif-management'
+                div(class="h-1 bg-primary rounded-full")
+        a(href=`/${url.split('/')[1]}/popup-management`)
+            p(class=(url.split('/')[2] === 'popup-management') ? "font-bold active" : "")=strings.POPUP()
+            if url.split('/')[2] === 'popup-management'
+                div(class="h-1 bg-primary rounded-full")
+        a(href=`/${url.split('/')[1]}/authority-management`)
+            p(class=(url.split('/')[2] === 'authority-management') ? "font-bold active" : "")=strings.AUTHORITY()
+            if url.split('/')[2] === 'authority-management'
+                div(class="h-1 bg-primary rounded-full")
+    block app-management-content

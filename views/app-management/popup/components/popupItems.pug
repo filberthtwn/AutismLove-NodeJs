@@ -1,0 +1,7 @@
+each popup, index in popups
+    tr
+        td= popup.id
+        td= moment(popup.start_date).format('YYYY-MM-DD') + ' ~ ' + moment(popup.end_date).format('YYYY-MM-DD')
+        td= popup.title
+        td(class="flex space-x-3")
+            a(class="action btn-primary" href="popup-management/" + popup.id)=strings.DETAILS() 

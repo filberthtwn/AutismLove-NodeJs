@@ -1,0 +1,399 @@
+extends layoutDataDetail 
+
+include components/userSection
+
+block popup-content 
+    p(class="text-center font-bold text-2xl mb-8")=strings.ADD_NEW_ANTICANCER_RECORD()
+            form(id="anticancer-record-form" action=url method="POST") 
+                div(id="anticancer-record-form-group" class="space-y-5 mb-8")
+                    div
+                        p(class="mb-2")=strings.DATE()
+                        input(id="anticancer_record_date_input" class="form-control border rounded-xl px-4 w-full" name="date" type="text" readOnly)
+                    div(class="flex space-x-5")
+                        div(class="flex")
+                            input(id="year-date-checkbox" class="mr-3" name="year" type="checkbox" checked)
+                            p=ucfirst(strings.YEAR().toLowerCase())
+                        div(class="flex")
+                            input(id="month-date-checkbox" class="mr-3" name="month" type="checkbox" checked)
+                            p=ucfirst(strings.MONTH().toLowerCase())
+                        div(class="flex")
+                            input(id="day-date-checkbox" class="mr-3" name="day" type="checkbox" checked)
+                            p=ucfirst(strings.DAY().toLowerCase())
+                        
+                    div
+                        div(class="mb-2")
+                            p(class="mb-2")=strings.VISIT_PURPOSE()
+                            input(id="anticancer_record_purpose_input" class="form-control border rounded-xl px-4 w-full" name="purpose" type="text" required)
+                        p(id="visit-purpose-length-warning" class="text-red-500 hidden")=strings.MUST_BE_LESS_THAN_TWENTY_CHAR()
+
+                    div(class="mb-1")
+                        div(class="mb-2")
+                            p(class="mb-2")=strings.ANC_NEUTOPHIL() 
+                            input(id="anticancer_record_anc_input" class="form-control border rounded-xl px-4 w-full" name="anc_number" type="text" required)
+                        p(id="anc-number-length-warning" class="text-red-500 hidden")=strings.MUST_BE_LESS_THAN_TEN_CHAR()
+
+                    div(class="flex")
+                        input(id="is-anc-calculate-method-enabled-input" class="mr-3" name="is_anc_calculated_result" type="checkbox")
+                        p=strings.CALCULATED_RESULT() 
+                    div(class="mb-2")
+                        div(id="anc-calculate-method-d")
+                            p(class="mb-2")=strings.CALCULATE_METHOD() 
+                            input(id="anc-calculate-method-input" class="form-control border rounded-xl px-4 w-full" name="anc_calculate_method" type="text")
+                    p(id="calculated-result-length-warning" class="text-red-500 hidden")=strings.MUST_BE_LESS_THAN_TWENTY_CHAR()
+                    div
+                        p(class="mb-2")=strings.ANTICANCER_INJECTION() 
+                        div(class="form-control custom-select")
+                            select(id="anticancer_record_injection_input" class="h-full w-full" name="injection")
+                                option(value="YES") YES
+                                option(value="NO") NO
+                                option(value="LESSEN") REDUCE
+                    div
+                        p(class="mb-2")=strings.LEUKOCTYE_STIMULATOR() 
+                        div(class="form-control custom-select")
+                            select(id="anticancer_record_stimulator_input" class="h-full w-full" name="stimulator")
+                                option(value='true') YES
+                                option(value='false') NO  
+            div(class="grid grid-flow-col grid-cols-2 gap-6")
+                    button(id="close_popup_btn" class="btn btn-danger rounded-full w-full")=strings.CANCEL()
+                    button(id="save-btn" class="btn btn-primary rounded-full w-full" type="submit" form="anticancer-record-form")=strings.SAVE()   
+
+block data-detail-content
+    +userSection(user)
+
+    div(class="flex flex-wrap w-full relative mb-8")
+        div(class="mx-auto")
+            button(id="create-new-record-btn" class="btn btn-primary px-6 rounded-full")=strings.CREATE_NEW_RECORD() 
+        div(class="absolute right-0")
+             a(class="btn btn-excel px-5" href=url + '/download-excel')
+                div(class="flex")
+                    img(class="mr-4" src="/assets/img/front-end/ic_excel.svg")
+                    p=strings.EXCEL_DOWNLOAD()
+
+    div(class="w-full bg-white rounded-2xl p-9 mb-8")
+        table(class="table table-auto w-full")
+            thead(class="border-b border-gray-200")
+                tr
+                    th
+                        button(class="sort-btn" data-name="date" data-sort="DESC")
+                            div(class='flex space-x-2')
+                                p(class="my-auto font-bold")=strings.DATE()
+                                div(class="sort-d my-auto")
+                                    img(class="sort-up-img sort-img active" src="/assets/img/front-end/ic_sort_up.svg" alt="" style="width: 10px; height: 10px;") 
+                                    img(class="sort-down-img sort-img hidden" src="/assets/img/front-end/ic_sort_down.svg" alt="" style="width: 10px; height: 10px;")
+                    th
+                        button(class="sort-btn" data-name="purpose" data-sort="ASC")
+                            div(class='flex space-x-2')
+                                p(class="my-auto font-bold")=strings.VISIT_PURPOSE()
+                                div(class="sort-d my-auto")
+                                    img(class="sort-up-img sort-img" src="/assets/img/front-end/ic_sort_up.svg" alt="" style="width: 10px; height: 10px;") 
+                                    img(class="sort-down-img sort-img hidden" src="/assets/img/front-end/ic_sort_down.svg" alt="" style="width: 10px; height: 10px;")
+                    th
+                        button(class="sort-btn" data-name="anc_number" data-sort="ASC")
+                            div(class='flex space-x-2')
+                                p(class="my-auto font-bold")=strings.ANC_NEUTOPHIL()
+                                div(class="sort-d my-auto")
+                                    img(class="sort-up-img sort-img" src="/assets/img/front-end/ic_sort_up.svg" alt="" style="width: 10px; height: 10px;") 
+                                    img(class="sort-down-img sort-img hidden" src="/assets/img/front-end/ic_sort_down.svg" alt="" style="width: 10px; height: 10px;")
+                    th
+                        button(class="sort-btn" data-name="anc_calculate_method" data-sort="ASC")
+                            div(class='flex space-x-2')
+                                p(class="my-auto font-bold")=strings.CALCULATE_METHOD()
+                                div(class="sort-d my-auto")
+                                    img(class="sort-up-img sort-img" src="/assets/img/front-end/ic_sort_up.svg" alt="" style="width: 10px; height: 10px;") 
+                                    img(class="sort-down-img sort-img hidden" src="/assets/img/front-end/ic_sort_down.svg" alt="" style="width: 10px; height: 10px;")
+                    th
+                        button(class="sort-btn" data-name="injection" data-sort="ASC")
+                            div(class='flex space-x-2')
+                                p(class="my-auto font-bold")=strings.ANTICANCER_INJECTION()
+                                div(class="sort-d my-auto")
+                                    img(class="sort-up-img sort-img" src="/assets/img/front-end/ic_sort_up.svg" alt="" style="width: 10px; height: 10px;") 
+                                    img(class="sort-down-img sort-img hidden" src="/assets/img/front-end/ic_sort_down.svg" alt="" style="width: 10px; height: 10px;")
+                    th
+                        button(class="sort-btn" data-name="stimulator" data-sort="ASC")
+                            div(class='flex space-x-2')
+                                p(class="my-auto font-bold")=strings.LEUKOCTYE_STIMULATOR()
+                                div(class="sort-d my-auto")
+                                    img(class="sort-up-img sort-img" src="/assets/img/front-end/ic_sort_up.svg" alt="" style="width: 10px; height: 10px;") 
+                                    img(class="sort-down-img sort-img hidden" src="/assets/img/front-end/ic_sort_down.svg" alt="" style="width: 10px; height: 10px;")
+                    th=strings.ACTION()
+            tbody(id="body-list")
+                each anticancer_record, index in anticancer_records
+                    tr 
+                        - const date = (anticancer_record.date) ? anticancer_record.date.split('-') : ""
+                        - var placeholders = ['UK', 'UK', 'UK'];
+                        - var momentDateFormat = []
+                        - var dateFormat = []
+                        - if (date.length > 0)
+                            - momentDateFormat.push("YYYY")
+                            - dateFormat.push("YY")
+                            - placeholders.pop();
+                        - if (date.length > 1)
+                            - momentDateFormat.push("MM")
+                            - dateFormat.push("MM")
+                            - placeholders.pop()
+                        - if (date.length > 2)
+                            - momentDateFormat.push("DD")
+                            - dateFormat.push("DD")
+                            - placeholders.pop()
+                           
+                        td= ((anticancer_record.date) ? moment(anticancer_record.date, momentDateFormat.join('-')).format(dateFormat.join('.')) + ((placeholders.length > 0) ? '.' : '') + placeholders.join('.') : "UK.UK.UK" )
+                        td= anticancer_record.purpose
+                        td= ((anticancer_record.is_anc_calculated_result) ? '약 ' : '') + anticancer_record.anc_number
+                        td= anticancer_record.anc_calculate_method
+                        td= (anticancer_record.injection == 'LESSEN') ? 'REDUCE' : anticancer_record.injection
+                        td= (anticancer_record.stimulator) ? 'YES' : 'NO'
+                        td(class="flex space-x-3")
+                            button(class="update-anticancer-record-btn action btn-edit" data-idx=index)=strings.EDIT()
+                            form(action=url + "/" + anticancer_record.id + '?_method=DELETE' method="POST")
+                                button(class="action btn-danger")=strings.DELETE()
+
+    div(id="pagination")!=pagination
+
+block js-script
+    script(src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js")
+    script.
+        var datePicker;
+        var url = !{JSON.stringify(url)};
+        var anticancerRecords=!{JSON.stringify(anticancer_records)};
+        const limit = !{JSON.stringify(limit)};
+        const totalCount = !{JSON.stringify(total_count)};
+        sortQuery = ['date', 'DESC'];
+
+        initializePagination(url, totalCount, limit, refreshAnticancerRecord);
+        initializeSorting(url, refreshAnticancerRecord);
+
+        /**
+         * Day, Month, Year checkbox handler
+        */
+        $('#day-date-checkbox,#month-date-checkbox,#year-date-checkbox').on('change', function(){
+            /// Enable date input
+            $('#anticancer_record_date_input').attr('disabled', false);
+
+            if($(this).is('#month-date-checkbox')){
+                if ($(this).is(':checked')){
+                    $('#year-date-checkbox').prop('checked', true);
+                }else{
+                    $('#day-date-checkbox').prop('checked', false);
+                }
+            }
+
+            if($(this).is('#day-date-checkbox')){
+                if ($(this).is(':checked')){
+                    $('#year-date-checkbox').prop('checked', true);
+                    $('#month-date-checkbox').prop('checked', true);
+                }
+            }
+
+            if($(this).is('#year-date-checkbox') && !$(this).is(':checked')){
+                $('#month-date-checkbox').prop('checked', false);
+                $('#day-date-checkbox').prop('checked', false);
+            }
+
+            if (!$('#year-date-checkbox').is(':checked')){
+                $('#anticancer_record_date_input').val('');
+                $('#anticancer_record_date_input').attr('disabled', true);
+
+                return
+            }
+            enableSaveBtn();
+            setupDatePicker(anticancerRecords);
+        })
+
+        $('#is-anc-calculate-method-enabled-input').on('change', function(){
+            enableSaveBtn();
+        })
+
+        /**
+         * Initialize anticancer record date picker
+        */
+        $('#create-new-record-btn').on("click", function(){
+            /// Setup form action
+            $('#anticancer-record-form').attr('action', url);
+
+            /// Set date input enabled
+            $('#anticancer_record_date_input').attr('disabled', false);
+
+            /// Set anc calculate method check status 'false'
+            $('#is-anc-calculate-method-enabled-input').prop('checked', false);
+
+            /// Clear anc calculate method input when checkbox toggled
+            $('#anc-calculate-method-input').val('');
+
+            $('#day-date-checkbox,#month-date-checkbox,#year-date-checkbox').prop('checked', true);
+            setupDatePicker(null);
+
+            $('#save-btn').attr('disabled', false);
+
+            $('#popup_d').addClass('flex')
+            $('#popup_d').removeClass('hidden')
+        })
+
+        $('.update-anticancer-record-btn').on("click", function(){
+                $('#popup_d').addClass('flex')
+                $('#popup_d').removeClass('hidden')
+                
+                const selectedIdx = $(this).data('idx');
+                const selectedAnticancerRecord = anticancerRecords[selectedIdx];    
+
+                $('#day-date-checkbox,#month-date-checkbox,#year-date-checkbox').prop('checked', false);
+                if (selectedAnticancerRecord.date){
+                    const date = selectedAnticancerRecord.date.split('-');
+                    if (date.length > 0){
+                        $('#year-date-checkbox').prop('checked', true);
+                    }
+                    if (date.length > 1){
+                        $('#month-date-checkbox').prop('checked', true);
+                    }
+                    if (date.length > 2){
+                        $('#day-date-checkbox').prop('checked', true);   
+                    }
+                }else{
+                    $('#day-date-checkbox').prop('checked', false);
+                    $('#month-date-checkbox').prop('checked', false);
+                    $('#year-date-checkbox').prop('checked', false);   
+                }
+                setupDatePicker(selectedAnticancerRecord);
+
+                $('#no-date-checkbox').prop('checked', false);
+                if (!selectedAnticancerRecord.date){
+                    $('#no-date-checkbox').prop('checked', true);
+                    $('#anticancer_record_date_input').val('');
+                    $('#anticancer_record_date_input').attr('disabled', true);
+                }
+
+                $('#anticancer-record-form').attr('action', 'anticancer-record/' + selectedAnticancerRecord.id + "?_method=PATCH");
+                $('#anticancer_record_purpose_input').val(selectedAnticancerRecord.purpose);
+                $('#anticancer_record_anc_input').val(selectedAnticancerRecord.anc_number);
+                $('#anc-calculate-method-input').val(selectedAnticancerRecord.anc_calculate_method);
+                $("#anticancer_record_injection_input").val(selectedAnticancerRecord.injection);
+                $("#anticancer_record_stimulator_input").val(selectedAnticancerRecord.stimulator.toString());
+
+                $('#is-anc-calculate-method-enabled-input').prop('checked', selectedAnticancerRecord.is_anc_calculated_result);
+
+                $('#save-btn').attr('disabled', true);
+
+                $('input[name="_method"]').val('patch');
+            })
+
+        $('input[type="text"]').on('input', function(){
+            enableSaveBtn();
+        })
+
+        $('select').on('change', function(){
+            enableSaveBtn();
+        })
+
+        $('#anticancer_record_purpose_input').on('input', function(){
+            if($(this).val().length > 20){
+                $('#save-btn').attr('disabled', true);
+                $('#visit-purpose-length-warning').removeClass('hidden');
+                return;
+            }
+
+            $('#visit-purpose-length-warning').addClass('hidden');
+        })
+
+        $('#anticancer_record_anc_input').on('input', function(){
+            if($(this).val().length > 10){
+                $('#save-btn').attr('disabled', true);
+                $('#anc-number-length-warning').removeClass('hidden');
+                return;
+            }
+
+            $('#anc-number-length-warning').addClass('hidden');
+        })
+
+        $('#anc-calculate-method-input').on('input', function(){
+            if($(this).val().length > 20){
+                $('#save-btn').attr('disabled', true);
+                $('#calculated-result-length-warning').removeClass('hidden');
+                return;
+            }
+
+            $('#calculated-result-length-warning').addClass('hidden');
+        })
+
+        function enableSaveBtn(){
+            if($('#anticancer_record_purpose_input').val().length > 20){
+                $('#save-btn').attr('disabled', true);
+                return;
+            }
+
+            if($('#anticancer_record_anc_input').val().length > 10){
+                $('#save-btn').attr('disabled', true);
+                return;
+            }
+
+            if($('#anc-calculate-method-input').val().length > 20){
+                $('#save-btn').attr('disabled', true);
+                return;
+            }
+
+            $('#save-btn').attr('disabled', false);
+        }
+        
+        function setupDatePicker(selectedAnticancerRecord){
+            if ($('#anticancer_record_date_input').length){
+                if (datePicker){
+                    datePicker.remove();
+                }
+
+                var dateFormat = [];
+
+                if ($('#year-date-checkbox').is(':checked')){
+                    dateFormat.push('YY')
+                }
+
+                if ($('#month-date-checkbox').is(':checked')){
+                    dateFormat.push('MM')
+
+                    if ($('#day-date-checkbox').is(':checked')){
+                        dateFormat.push('DD')
+                    }
+                }
+
+                const dateFormatStr = dateFormat.join('.');
+                console.log(dateFormatStr);
+
+                const options = {
+                    formatter: (input, date, instance) => {
+                        const value = moment(date).format(dateFormatStr);
+                        input.value = value
+                    },
+                    dateSelected: new Date(),
+                    onSelect: (instance, date) => {
+                        enableSaveBtn();
+                    }
+                }
+                
+                if (selectedAnticancerRecord && selectedAnticancerRecord.date){
+                    const date = selectedAnticancerRecord.date.split('-');
+                    const momentDateFormat = [];
+
+                    if (date.length > 0){
+                        momentDateFormat.push('YYYY');
+                    }
+
+                    if (date.length > 1){
+                        momentDateFormat.push('MM');
+                    }
+
+                    if (date.length > 2){
+                        momentDateFormat.push('DD');
+                    }
+
+                    const momentDateFormatStr = momentDateFormat.join('-');
+                    options.dateSelected = moment(selectedAnticancerRecord.date, momentDateFormatStr).toDate();
+                }
+                datePicker = datepicker('#anticancer_record_date_input', options)
+            }  
+        }
+
+        function refreshAnticancerRecord(response){
+            $('#pagination').html(response.data.pagination);
+            initializePagination(url, totalCount, limit, refreshAnticancerRecord);
+            
+            $('#body-list').html(response.data.anticancer_record_items);
+        }
+
+        

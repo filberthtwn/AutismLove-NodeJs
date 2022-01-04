@@ -1,0 +1,27 @@
+each survey, index in surveys
+    - var surveyCount = 0
+    - var severityCount = 0
+    - var frequencyCount = 0
+    - var dailyLifeCount = 0
+    - var yesNoCount = 0
+    each side_effect, index in survey.side_effects
+        each survey_question, index in side_effect.survey_questions
+            - surveyCount = surveyCount + 1;
+            case survey_question.survey_answer_sub_type.survey_answer_type.name
+                when '심각도'
+                    - severityCount = severityCount + 1;
+                when '빈도'
+                    - frequencyCount = frequencyCount + 1;
+                when '일상생활 영향'
+                    - dailyLifeCount = dailyLifeCount + 1;
+                when '이상유무'
+                    - yesNoCount = yesNoCount + 1;
+    tr
+        td=survey.name
+        td=surveyCount
+        td=severityCount
+        td=frequencyCount
+        td=dailyLifeCount
+        td=yesNoCount
+        td(class="flex space-x-3")
+            a(class="action btn-primary" href=url + '/' + survey.id)=strings.DETAILS()

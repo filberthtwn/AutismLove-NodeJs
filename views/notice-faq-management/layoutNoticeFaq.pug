@@ -1,0 +1,14 @@
+extends /layout_dashboard
+
+block dashboard-content
+    +alert(response)
+    div(class="flex space-x-5 mb-8")
+        a(href=`/${url.split('/')[1]}/notice`)
+            p(class=(url.split('/')[2] === 'notice') ? "font-bold active" : "")=strings.NOTICE()
+            if url.split('/')[2] === 'notice'
+                div(class="h-1 bg-primary rounded-full")
+        a(href=`/${url.split('/')[1]}/faq`)
+            p(class=(url.split('/')[2] === 'faq') ? "font-bold active" : "")=strings.FAQ()
+            if url.split('/')[2] === 'faq'
+                div(class="h-1 bg-primary rounded-full")
+    block notice-faq-content

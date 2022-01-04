@@ -1,0 +1,114 @@
+extends /layout_dashboard
+
+block dashboard-content
+    div(class="relative w-full mb-8")
+        div(class="flex")
+            a(class="btn btn-back mr-4" href="/app-management/side-effect-management")
+                img(src="/assets/img/front-end/ic_back.svg", alt="")
+            p(class="my-auto")=strings.SIDE_EFFECT_MANAGEMENT()
+        p(class="font-bold my-auto centered-axis-x" style="top:3.5px;")=strings.EDIT_SIDE_EFFECT()
+
+    div(class="w-full bg-white rounded-2xl p-9 mb-8")
+        form(id="side-effect-form" action=url + "?_method=PATCH" method="POST") 
+            div(class="mb-4")
+                p(class="mb-2")=strings.TITLE()
+                input(class="form-control border rounded-xl px-4 w-full" type="text" name="name" required value=(sideEffect) ? sideEffect.name : '')
+            div
+                p(class="mb-2")=strings.DESCRIPTION()
+                textarea(id="side-effect-description-input" class="hidden" name="description")
+                div(id="side-effect-description-editor" style="height:250px;")
+                    div(id="toolbar")
+                    - if (sideEffect)
+                        !=sideEffect.description
+    
+    div(class="flex w-full")
+        div.ml-auto
+            //- if url.split("/")[url.split("/").length - 1] != 'create'
+            //-     form(class="inline-block" action=url + "?_method=DELETE"  method="POST")
+            //-         button(class="btn btn-danger w-36 rounded-full mr-6") Delete
+            button(id="save-btn" class="btn btn-primary w-36 rounded-full" type="submit" form="side-effect-form" disabled)=strings.SAVE() 
+block js-script
+    script.
+        const url = !{JSON.stringify(url)};
+
+        const toolbarOptions = [
+            ['bold', 'italic', 'underline', 'strike'],
+            [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+            [{ 'indent': '-1'}, { 'indent': '+1' }],
+            [{ 'direction': 'rtl' }],
+            [{ 'size': ['small', false, 'large', 'huge'] }], 
+            [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+            [{ 'color': [] }, { 'background': [] }],
+            [{ 'align': [] }],
+            ['link', 'image']
+        ];
+
+        function selectLocalImage() {
+            const input = document.createElement('input');
+            input.setAttribute('type', 'file');
+            input.click();
+
+            // Listen upload local image and save to server
+            input.onchange = () => {
+                const file = input.files[0];
+
+                // file type is only image.
+                if (/^image\//.test(file.type)) {
+                    saveToServer(file);
+                } else {
+                console.warn('You could only upload images.');
+                }
+            };
+        }
+
+        function saveToServer(image){
+            const formData = new FormData()
+            formData.append('image', image)
+
+            $.ajax({
+                type: 'POST',
+                url: url + '/upload-image',
+                data: formData,
+                cache: false,
+                contentType: false,
+                processData: false,
+                success: function(response){
+                    insertToEditor(response.link);
+                },
+                error: function(request, status, error){
+                    alert(request.responseText);
+                }
+            });
+        };
+
+        function insertToEditor(url) {
+            const range = quill.getSelection();
+            quill.insertEmbed(range.index, 'image', url);
+        }
+
+        const quill = new Quill('#side-effect-description-editor', {
+            theme: 'snow',
+            modules: {
+                toolbar: toolbarOptions
+            },
+        });
+
+        const toolbar = quill.getModule('toolbar').addHandler('image', () => {
+            selectLocalImage();
+        });
+
+        $('#side-effect-form').on("submit", function(){
+            $('#side-effect-description-input').val($('#side-effect-description-editor .ql-editor').html());
+        });
+
+        $('input[type="text"]').on('input', function(){
+            enableSaveBtn();
+        })
+
+        quill.on('text-change', function(delta, oldDelta, source) {
+           enableSaveBtn();
+        });
+
+        function enableSaveBtn(){
+            $('#save-btn').attr('disabled', false);
+        }

@@ -1,0 +1,61 @@
+extends /app-management/layoutAppManagement
+
+block app-management-content
+    div(class="w-full bg-white rounded-2xl p-9 mb-8")
+        div(class="flex mb-8")
+            a(class="btn btn-primary mx-auto px-14" href="popup-management/create")=strings.CREATE_POPUP()
+        table(class="table table-auto w-full")
+            thead(class="border-b border-gray-200")
+                tr
+                    th
+                        button(class="sort-btn" data-name="id" data-sort="ASC")
+                            div(class='flex space-x-2')
+                                p(class="my-auto font-bold")=strings.POPUP_ID()
+                                div(class="sort-d my-auto")
+                                    img(class="sort-up-img sort-img active" src="/assets/img/front-end/ic_sort_up.svg" alt="" style="width: 10px; height: 10px;") 
+                                    img(class="sort-down-img sort-img hidden" src="/assets/img/front-end/ic_sort_down.svg" alt="" style="width: 10px; height: 10px;")
+                    th
+                        button(class="sort-btn" data-name="start_date" data-sort="ASC")
+                            div(class='flex space-x-2')
+                                p(class="my-auto font-bold")=strings.EXPOSE_DURATION()
+                                div(class="sort-d my-auto")
+                                    img(class="sort-up-img sort-img" src="/assets/img/front-end/ic_sort_up.svg" alt="" style="width: 10px; height: 10px;") 
+                                    img(class="sort-down-img sort-img hidden" src="/assets/img/front-end/ic_sort_down.svg" alt="" style="width: 10px; height: 10px;")
+                    th
+                        button(class="sort-btn" data-name="title" data-sort="ASC")
+                            div(class='flex space-x-2')
+                                p(class="my-auto font-bold")=strings.TITLE()
+                                div(class="sort-d my-auto")
+                                    img(class="sort-up-img sort-img" src="/assets/img/front-end/ic_sort_up.svg" alt="" style="width: 10px; height: 10px;") 
+                                    img(class="sort-down-img sort-img hidden" src="/assets/img/front-end/ic_sort_down.svg" alt="" style="width: 10px; height: 10px;")
+                    th=strings.ACTION()
+            tbody(id="body-list")
+                each popup, index in popups
+                    tr
+                        td= popup.id
+                        td= moment(popup.start_date).format('YYYY-MM-DD HH:mm') + ' ~ ' + moment(popup.end_date).format('YYYY-MM-DD HH:mm')
+                        td= popup.title
+                        td(class="flex space-x-3")
+                            a(class="action btn-primary" href="popup-management/" + popup.id)=strings.DETAILS() 
+    div(id="pagination")!=pagination
+
+block js-script
+    <!-- Pagination Javascripts -->
+    script.
+        var url = !{JSON.stringify(url)};
+        const limit = !{JSON.stringify(limit)};
+        const totalCount = !{JSON.stringify(total_count)};
+        sortQuery = ['id', 'DESC'];
+
+        initializePagination(url, totalCount, limit, refreshPopup);
+        initializeSorting(url, refreshPopup);
+
+        function refreshPopup(response){
+            $('#pagination').html(response.data.pagination);
+            initializePagination(url, totalCount, limit, refreshPopup);
+            
+            $('#body-list').html(response.data.popup_items);
+        }
+
+
+

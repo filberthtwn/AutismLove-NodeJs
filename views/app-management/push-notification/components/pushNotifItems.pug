@@ -1,0 +1,7 @@
+each notification, index in notifications
+    tr
+        td= moment(notification.created_at).format('YYYY-MM-DD')
+        td= notification.id
+        td= notification.title
+        td(class="flex space-x-3")
+            button(class="push-notif-edit-btn action btn-edit" data-idx=index)=strings.EDIT() 

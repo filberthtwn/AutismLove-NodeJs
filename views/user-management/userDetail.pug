@@ -1,0 +1,172 @@
+extends /layout_dashboard
+
+block popup-content
+    p(class="text-center font-bold text-2xl mb-8")=strings.CHANGE_PASSWORD()
+    form(id="change-password-form" action=url + '/change-password?_method=PATCH' method="POST") 
+        div(id="change-password-form-group" class="space-y-5 mb-8")
+            div
+                p(class="mb-2")=strings.NEW_PASSWORD()
+                input(id="new-password-input" class="form-control border rounded-xl px-4 w-full" name="new_password" type="password" required)
+            div
+                p(class="mb-2")=strings.CONFIRM_NEW_PASSWORD()
+                input(id="confirm-new-password-input" class="form-control border rounded-xl px-4 w-full" name="confirm_new_password" type="password" required)
+    div(class="grid grid-flow-col grid-cols-2 gap-6")
+            button(id="close_popup_btn" class="btn btn-danger rounded-full w-full")=strings.CANCEL()
+            button(class="btn btn-primary rounded-full w-full" type="submit" form="change-password-form")=strings.SAVE() 
+
+block dashboard-content
+    +alert(response)
+    form(id="update-form" action=url method="POST")
+        div(class="relative w-full mb-8")
+            div(class="flex")
+                a(class="btn btn-back mr-4" href="/user-management")
+                    img(src="/assets/img/front-end/ic_back.svg", alt="")
+                p(class="my-auto")=strings.USER_MANAGEMENT()
+            p(class="font-bold my-auto centered-axis-x" style="top:3.5px;")=strings.USER_DETAIL()
+
+        div(class="w-full bg-white rounded-2xl p-9 mb-8")
+            div(class="grid grid-cols-2 gap-8 mb-8")
+                div(class="col-span-1") 
+                    p(class="mb-2")=strings.ID()
+                    input(class="form-control border rounded-xl px-4 w-full" name="email" type="text" value=user.email disabled)
+                div(class="col-span-1") 
+                    p(class="mb-2")=strings.NICKNAME() 
+                    input(class="form-control border rounded-xl px-4 w-full" name="nickname" type="text" value=user.nickname)
+                div(class="col-span-2") 
+                    div(class="flex space-x-8")
+                        div(class="flex-grow")
+                            p(class="mb-2")=strings.PASSWORD()
+                            input(class="form-control border rounded-xl px-4 w-full" name="password" type="text" value="*******" disabled)
+                        div(class="mt-auto")
+                            button(id="change-password-btn" class="btn btn-primary w-36 rounded-full" type="button")=strings.CHANGE()
+                div(class="col-span-1") 
+                    p(class="mb-2")=strings.NAME() 
+                    input(class="form-control border rounded-xl px-4 w-full" name="name" type="text" value=user.name)
+                div(class="col-span-1") 
+                    p(class="mb-2")=strings.PHONE_NUMBER() 
+                    input(class="form-control border rounded-xl px-4 w-full"  name="phone_number" type="text" value=user.phone_number)
+                div(class="col-span-1")
+                    p(class="mb-2")=strings.BIRTHYEAR() 
+                    input(id="birthYear-input" class="form-control border rounded-xl px-4 w-full" name="birth_year" type="text" value=user.birth_year)
+                div(class="col-span-1")
+                    p(class="mb-2")=strings.GENDER()
+                    div(class="form-control custom-select")
+                        select(class="h-full w-full" name="gender")
+                            option(value="MALE" selected=(user.gender == "MALE"))=strings.MALE()
+                            option(value="FEMALE" selected=(user.gender == "FEMALE"))=strings.FEMALE()
+            div(class="flex justify-between") 
+                p #[span.font-bold=strings.LAST_LOGIN_AT() + ': ']
+                    = (user.last_login_at != null) ? moment(user.last_login_at).format('YYYY-MM-DD HH:mm') : '-'
+                p #[span.font-bold=strings.SIGN_UP_DATE() + ': '] #{ moment(user.created_at).format('YYYY-MM-DD HH:mm')}
+
+        div(class="w-full bg-white rounded-2xl p-9 mb-8")
+            div(class="grid grid-cols-2 gap-8 mb-8")
+                div(class="col-span-1") 
+                    p(class="mb-2") 호르몬 (ER, PR) 
+                    div(class="form-control custom-select")
+                        select(class="h-full w-full" name="hormone_receptor")
+                            option(value="POSITIVE" selected=(user.hormone_receptor == "POSITIVE"))=strings.POSITIVE()
+                            option(value="NEGATIVE" selected=(user.hormone_receptor == "NEGATIVE"))=strings.NEGATIVE()
+                            option(value="I_DONT_KNOW" selected=(user.hormone_receptor == "I_DONT_KNOW"))=strings.I_DONT_KNOW()
+                div(class="col-span-1") 
+                    p(class="mb-2") 허투 (HER2) 
+                    div(class="form-control custom-select")
+                        select(class="h-full w-full" name="human_epidermal_receptor")
+                            option(value="POSITIVE" selected=(user.human_epidermal_receptor == "POSITIVE"))=strings.POSITIVE()
+                            option(value="NEGATIVE" selected=(user.human_epidermal_receptor == "NEGATIVE"))=strings.NEGATIVE()
+                            option(value="I_DONT_KNOW" selected=(user.human_epidermal_receptor == "I_DONT_KNOW"))=strings.I_DONT_KNOW()
+                div(class="col-span-2") 
+                    p(class="mb-2")=strings.NOTE_OPTIONAL()
+                    input(class="form-control border rounded-xl px-4 w-full" name="note" type="text" value=user.note)
+                div(class="col-span-2") 
+                    p(class="mb-2")=strings.HOSPITAL()
+                    input(class="form-control border rounded-xl px-4 w-full" name="hospital_name" type="text" value=user.hospital_name)
+                div(class="col-span-1") 
+                    div(class="mb-3")
+                        p(class="mb-2")=strings.SURGERY_DATE()
+                        input(id="surgery_date_input" class="form-control border rounded-xl px-4 w-full" name="surgery_date" type="text" readOnly disabled=(user.surgery_date == '') ? true : false)
+                    div(class="flex")
+                        input(id="no-surgery-date-checkbox" class="mr-3" name="no_surgery_date" type="checkbox" checked=(user.surgery_date == '') ? 'checked' : undefined)
+                        p=ucfirst(strings.I_DONT_KNOW().toLowerCase())
+                    
+
+                div(class="col-span-1") 
+                    p(class="mb-2")=strings.ANTICANCER_MED_TYPE()
+                    if user.anticancer_med.name != "AC4차 + Paclitaxel12차"
+                        div(class="form-control custom-select")
+                            select(class="h-full w-full" name="anticancer_med_id")
+                                each anticancer_med in anticancer_meds
+                                    option(value=anticancer_med.id selected=user.anticancer_med_id == anticancer_med.id disabled=(anticancer_med.identifier == 'I_DONT_KNOW'))=(anticancer_med.identifier != 'I_DONT_KNOW') ?anticancer_med.name : strings.I_DONT_KNOW()
+                    else
+                        input(class="form-control border rounded-xl px-4 w-full" type="text" value=user.anticancer_med.name disabled)
+
+                div(class="col-span-1") 
+                    p(class="mb-2")=strings.ANTICANCER_ROUTE()
+                    div.flex
+                        p(class="mr-2")
+                            -if(user.injection_routes.length > 0)
+                                =user.injection_routes[user.injection_routes.length-1].anticancer_med_design_element.name + ((last_survey_record != null) ? ('Week-' + last_survey_record.week) : '')
+                            -else
+                                ='진단'
+                        a(class="font-bold underline" href="/data-management/" + user.id + "/route")=strings.SEE_DETAILS()
+
+    div(class="flex w-full")
+        div.ml-auto
+            form(class="mr-6 inline-block" action=url + '/status' method="POST")
+                button(class="btn btn-danger w-36 rounded-full")= (user.is_active) ? strings.DEACTIVATED() : strings.ACTIVED()
+            button(id="save-btn" class="btn btn-primary w-36 rounded-full" type="submit" form="update-form" disabled)=strings.SAVE()    
+
+block js-script
+    script.
+        const user = !{JSON.stringify(user)};
+        var datePicker;
+
+        if(user.surgery_date != ''){
+            setupDatePicker(moment(user.surgery_date, 'YYYY-MM-DD').toDate());
+        }
+        
+        $('#change-password-btn').on('click', function(){
+            $('#popup_d').addClass('flex')
+            $('#popup_d').removeClass('hidden')
+        })
+
+        $('input[type="text"]').on('input', function(){
+            enableSaveBtn();
+        })
+
+        $('select').on('change', function(){
+            enableSaveBtn();
+        })
+
+        $('#no-surgery-date-checkbox').on('change', function(){
+            if ($(this).is(':checked')){
+                $('#surgery_date_input').val('');
+            }else{
+                setupDatePicker(new Date());
+            }
+            $('#surgery_date_input').attr('disabled', $(this).is(':checked'));
+            
+            enableSaveBtn();
+        });
+
+        function setupDatePicker(selectedDate){
+            if(datePicker){
+                datePicker.remove();
+            }
+
+            datePicker = datepicker('#surgery_date_input', {
+                formatter: (input, date, instance) => {
+                    const value = moment(date).format('YYYY-MM-DD');
+                    input.value = value
+                },
+                onSelect: (instance, date) => {
+                    enableSaveBtn();
+                },
+                dateSelected: selectedDate,
+            })
+        }
+
+        function enableSaveBtn(){
+            $('#save-btn').attr('disabled', false);
+        }
+

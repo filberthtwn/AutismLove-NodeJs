@@ -1,0 +1,13 @@
+div(class="survey-question-d grid grid-flow-col grid-cols-12 gap-6 mb-4")
+    div(class="col-span-3")
+        p(class="mb-2")=strings.A_TYPE() 
+        div(class="form-control custom-select")
+            select(class="survey_answer_sub_type_input h-full w-full" name="side_effects[0][survey_questions][survey_answer_sub_type_id]")
+                each survey_answer_type, index in survey_answer_types
+                    each survey_answer_sub_type, index in survey_answer_type.survey_answer_sub_types
+                        option(value=survey_answer_sub_type.id)=survey_answer_type.name + ' (' + survey_answer_sub_type.name + ')'
+    div(class="col-span-7")
+        p(class="mb-2")=strings.Q_LONG() 
+        input(class="survey-question-input form-control border rounded-xl px-4 w-full" type="text" name="side_effects[0][survey_questions][question]" required)
+    div(class="col-span-2 flex")
+        button(class="survey-question-delete-btn btn btn-danger w-full mt-auto" type="button" data-parent-idx='0' data-idx="0")=strings.DELETE() 

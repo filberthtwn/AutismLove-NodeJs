@@ -1,0 +1,9 @@
+each user in users
+    tr 
+        td=moment(user.created_at).format('YYYY-MM-DD')
+        td=user.email
+        td=user.name
+        td=user.phone_number
+        td=user.anticancer_med.name
+        td
+            a(class="action btn-primary" href="user-management/" + user.id)=strings.DETAILS()

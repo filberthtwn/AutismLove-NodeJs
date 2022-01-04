@@ -1,0 +1,51 @@
+extends /layout_dashboard
+
+block dashboard-content
+    div(class="relative w-full mb-8")
+        div(class="flex")
+            a(class="btn btn-back mr-4" href="/notice-faq-management/notice")
+                img(src="/assets/img/front-end/ic_back.svg", alt="")
+            p(class="my-auto")=strings.NOTICE_MANAGEMENT()
+        p(class="font-bold my-auto centered-axis-x" style="top:3.5px;")=title
+
+    div(class="w-full bg-white rounded-2xl p-9 mb-8")
+        - const method = url.split("/")[url.split("/").length - 1]
+        if method != 'create'
+            p(class="mb-5") #[span.font-bold=strings.CREATED_AT()]: 
+                =moment(notice.created_at).format('YYYY-MM-DD')
+        form(id="notice-form" action=url + ((method != 'create') ? "?_method=PATCH" : "") method="POST") 
+            div(class="mb-4")
+                p(class="mb-2")=strings.TITLE()
+                input(class="form-control border rounded-xl px-4 w-full" type="text" name="title" required value=(notice) ? notice.title : '')
+            div
+                p(class="mb-2")=strings.DESCRIPTION()
+                textarea(id="notice-description-input" class="hidden" name="description")
+                div(id="notice-description-editor" style="height:250px;")!= (notice) ? notice.description : ''
+    
+    div(class="flex w-full")
+        div.ml-auto
+            if url.split("/")[url.split("/").length - 1] != 'create'
+                form(class="inline-block" action=url + "?_method=DELETE"  method="POST")
+                    button(class="btn btn-danger w-36 rounded-full mr-6")=strings.DELETE()
+            button(id="save-btn" class="btn btn-primary w-36 rounded-full" type="submit" form="notice-form" disabled=(notice))=strings.SAVE() 
+block js-script
+    script.
+        const noticeDescEditor = new Quill('#notice-description-editor', {
+            theme: 'snow'
+        });
+
+        $('#notice-form').on("submit", function(){
+            $('#notice-description-input').val($('#notice-description-editor .ql-editor').html());
+        });
+
+        $('input[type="text"]').on('input', function(){
+            enableSaveBtn();
+        })
+
+        noticeDescEditor.on('text-change', function(delta, oldDelta, source) {
+           enableSaveBtn();
+        });
+
+        function enableSaveBtn(){
+            $('#save-btn').attr('disabled', false);
+        }

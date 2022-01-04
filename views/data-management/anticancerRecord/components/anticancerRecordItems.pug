@@ -1,0 +1,26 @@
+each anticancer_record, index in anticancer_records
+    tr 
+        - const date = anticancer_record.date.split('-')
+        - var placeholders = ['UK', 'UK', 'UK'];
+        - var momentDateFormat = []
+        - var dateFormat = []
+        - if (date.length > 0)
+            - momentDateFormat.push("DD")
+            - dateFormat.push("DD")
+        - if (date.length > 1)
+            - momentDateFormat.push("MM")
+            - dateFormat.push("MM")
+        - if (date.length > 2)
+            - momentDateFormat.push("YYYY")
+            - dateFormat.push("YY")
+            
+        td= ((anticancer_record.date) ? moment(anticancer_record.date, momentDateFormat.join('-')).format(dateFormat.join('.')) : '-' ) + ((placeholders.length > 0) ? '.' : '') + placeholders.join('.')
+        td= anticancer_record.purpose
+        td= ((anticancer_record.is_anc_calculated_result) ? '약 ' : '') + anticancer_record.anc_number
+        td= anticancer_record.anc_calculate_method
+        td= (anticancer_record.injection == 'LESSEN') ? 'REDUCE' : anticancer_record.injection
+        td= (anticancer_record.stimulator) ? 'YES' : 'NO'
+        td(class="flex space-x-3")
+            button(class="update-anticancer-record-btn action btn-edit" data-idx=index)=strings.EDIT()
+            form(action=url + "/" + anticancer_record.id + '?_method=DELETE' method="POST")
+                button(class="action btn-danger")=strings.DELETE()

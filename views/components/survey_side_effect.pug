@@ -1,0 +1,13 @@
+div(class="survey-side-effect-d w-full bg-white rounded-2xl p-9 mb-8")
+    p(class="survey-question-order font-bold text-center") 01
+    div(class="mb-4")
+        div(class="grid grid-flow-col grid-cols-12 gap-6 mb-4")
+            div(class="col-span-10")
+                p(class="mb-2")=strings.SURVEY_Q_SHORT() 
+                input(class="survey-q-short-input form-control border rounded-xl px-4 w-full" type="text" name="side_effects[0][name]")
+            div(class="col-span-2 delete-question-btn-d flex")
+                button(class="side-effect-delete-btn btn btn-danger w-full mt-auto" type="button" data-idx=0)=strings.DELETE() 
+    div(class="survey-questions-d")
+        
+    div(class="add-question-btn-d flex")
+        button(class="survey-question-add-btn btn btn-primary mx-auto" type="button" style="width: 150px;" data-idx=0) +

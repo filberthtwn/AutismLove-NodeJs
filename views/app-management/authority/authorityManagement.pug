@@ -1,0 +1,21 @@
+extends ../layoutAppManagement
+
+block app-management-content
+    div(class="w-full bg-white rounded-2xl p-9 mb-8")
+        form(id="anticancer_edit_authority_form" action=url + "?_method=PATCH" method="POST")
+            p(class="mb-2")=strings.ANTICANCER_RECORD_EDIT_AUTHORITY()
+            div(class="flex space-x-3")
+                p() Off
+                div(class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in")                
+                    input(type="checkbox" name="is_edit_anticancer_authority_enable" id="toggle" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer" checked=(isEditAnticancerAuthorityEnable == 'true') ? 'checked' : undefined)
+                    label(for="toggle" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer")
+                p On
+    div(class="flex mb-8")
+            button(id="save-btn" class="btn btn-primary ml-auto px-14" form="anticancer_edit_authority_form" disabled)=strings.SAVE()
+block js-script
+    script.
+         $('input[type="checkbox"]').on('change', function(){
+            $('#save-btn').attr('disabled', false);
+        })
+
+

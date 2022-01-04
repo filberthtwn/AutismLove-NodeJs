@@ -1,0 +1,21 @@
+mixin userSection(user)
+    div(class="w-full bg-white rounded-2xl p-9 mb-8")
+        div(class="grid grid-cols-6 gap-8")
+            div(class="col-span-1") 
+                p(class="font-bold mb-2")=strings.ID()
+                p= user.email
+            div(class="col-span-1") 
+                p(class="font-bold mb-2")=strings.NAME()
+                p= user.name
+            div(class="col-span-1") 
+                p(class="font-bold mb-2")=strings.NICKNAME()
+                p= (user.nickname ? user.nickname : '-')
+            div(class="col-span-1") 
+                p(class="font-bold mb-2")=strings.BIRTHYEAR()
+                p= user.birth_year
+            div(class="col-span-1") 
+                p(class="font-bold mb-2")=strings.PHONE_NUMBER()
+                p= user.phone_number
+            div(class="col-span-1") 
+                p(class="font-bold mb-2")=strings.ANTICANCER_MED_TYPE()
+                p= user.anticancer_med.name

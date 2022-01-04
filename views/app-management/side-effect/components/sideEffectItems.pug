@@ -1,0 +1,7 @@
+each side_effect, index in side_effects
+    tr
+        td(style="text-align: center")= side_effect.survey.name
+        td(style="text-align: center")= side_effect.order
+        td(style="text-align: center")= side_effect.name
+        td(class="flex space-x-3")
+            a(class="action btn-edit" href=url + "/" + side_effect.id)=strings.EDIT()

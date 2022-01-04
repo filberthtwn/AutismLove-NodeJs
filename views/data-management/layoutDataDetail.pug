@@ -1,0 +1,35 @@
+extends /layout_dashboard
+
+block dashboard-content
+    div(id="popup_d" class="fixed inset-0 z-50 hidden")
+        div(class="absolute inset-0 bg-opacity-50 bg-black")
+        div(id="popup-d-content" class="m-auto bg-white z-50 p-12 rounded-lg overflow-y-auto" style="min-width: 500px; max-height: 90%;")
+            block popup-content 
+    
+    +alert(response)
+    div(class="relative w-full mb-8")
+        div(class="flex")
+            a(class="btn btn-back mr-4" href="/data-management")
+                img(src="/assets/img/front-end/ic_back.svg", alt="")
+            p(class="my-auto")=strings.DATA_MANAGEMENT()
+        p(class="font-bold my-auto centered-axis-x" style="top:3.5px;")=strings.DATA_DETAIL()
+
+    div(class="flex space-x-5 mb-8")
+        a(href=`/${url.split('/')[1]}/${url.split('/')[2]}/route`)
+            p(class=(url.split('/')[3] === 'route') ? "font-bold active" : "")=strings.ROUTE()
+            if url.split('/')[3] === 'route'
+                div(class="h-1 bg-primary rounded-full")
+        a(href=`/${url.split('/')[1]}/${url.split('/')[2]}/anticancer-record`)
+            p(class=(url.split('/')[3] === 'anticancer-record') ? "font-bold active" : "")=strings.ANTICANCER_RECORD()
+            if url.split('/')[3] === 'anticancer-record'
+                div(class="h-1 bg-primary rounded-full")
+        a(href=`/${url.split('/')[1]}/${url.split('/')[2]}/survey-list`)
+            p(class=(url.split('/')[3] === 'survey-list') ? "font-bold active" : "")=strings.SURVEY_LIST()
+            if url.split('/')[3] === 'survey-list'
+                div(class="h-1 bg-primary rounded-full")
+
+    block data-detail-content
+      
+    
+
+

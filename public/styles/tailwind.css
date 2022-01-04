@@ -1,0 +1,168 @@
+@tailwind base;
+@tailwind components;
+.form-control{
+    height: 50px;
+    @apply border rounded-xl px-4;
+}
+
+.toggle-checkbox:checked {
+    @apply: right-0 border-green-400 !important;
+    right: 0;
+    border-color: #68D391;
+}
+
+.toggle-checkbox:checked + .toggle-label {
+    @apply: bg-green-400 !important;
+    background-color: #68D391 !important;
+}
+
+@tailwind utilities;
+
+@layer utilities{
+    body{
+        color:#505D7C;
+    }
+
+    select {
+        -webkit-appearance: none;
+        appearance: none;
+    }
+    
+    .table thead tr th{
+        @apply text-sm font-bold text-left;
+    }
+
+    .table thead tr th,
+    .table tbody tr td{
+        @apply p-2;
+    }
+    
+    input:focus-visible,
+    button:focus-visible,
+    input:focus,
+    button:focus,
+    textarea:focus,
+    textarea:focus-visible{
+        @apply outline-none;
+    }
+
+    textarea{
+        resize: none;
+    }
+
+    button {
+        /* height: 55px; */
+    }
+
+    .btn{
+        height: 50px;
+        @apply inline-block rounded-full;
+    }
+
+    a.btn{
+        line-height:50px;
+    }
+
+    .action:disabled,
+    .btn:disabled{
+        background-color: #E9E9E9;
+        color: #C7C7C7;
+        cursor: not-allowed;
+    }
+
+    .btn:not(.clockpicker-button):hover{
+        color: white;
+    }
+
+    .btn-primary{
+        @apply bg-primary text-white;
+    }
+
+    .btn-danger{
+        @apply border border-primary text-primary;
+    }
+
+    .btn-danger:hover{
+        @apply text-primary-darker border-primary-darker !important;
+    }
+
+    .btn-excel {
+        color: #376D47;
+        border-color: #376D47;
+        @apply border;
+    }
+
+    .btn-edit{
+        background-color: #F3B041;
+        @apply text-white;
+    }
+
+    .btn-back{
+        width: 35px;
+        height: 35px;
+        @apply flex bg-primary text-white rounded-full;
+    }
+
+    .btn-back img{
+        @apply m-auto;
+    }
+
+    .action{
+        height: 35px;
+        line-height: 35px;
+        @apply inline-block transition-colors align-middle text-center rounded-full cursor-pointer px-4;
+    }
+
+    .btn-back:hover,
+    .btn-primary:hover{
+        @apply bg-primary-darker transition-colors;
+    }
+
+    .nav-link.active {
+        @apply bg-white;
+    }
+    
+    .wrapper{
+        margin-left: 300px;
+        @apply p-16;
+    }
+
+    .custom-select{
+        position: relative;
+    }
+
+    .form-control.custom-select:after{
+        content: "▼";
+        font-size: 12px ;
+        top: 16px;
+        right: 1rem;
+        position: absolute;        
+    }
+
+    .centered-axis-x {
+        position: absolute;
+        left: 50%;
+        transform: translate(-50%, 0);
+    }
+
+    .page-btn{
+        @apply bg-white opacity-50;
+    }
+
+    .page-btn.active{
+        @apply bg-primary text-white opacity-100;
+    }
+
+    .sort-img{
+        @apply opacity-25;
+    }
+
+    .sort-img.active{
+        @apply opacity-100;
+    }
+
+    .clockpicker-button{
+        @apply rounded-none !important;
+    }
+};
+

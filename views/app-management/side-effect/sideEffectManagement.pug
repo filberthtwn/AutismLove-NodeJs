@@ -1,0 +1,73 @@
+extends ../layoutAppManagement
+
+block app-management-content
+    div 
+        p(class="font-bold text-xl mb-5")=strings.ANC_SIDE_EFFECT_MANAGEMENT()
+        div(class="w-full bg-white rounded-2xl p-9 mb-8 space-y-8")
+            div
+                p(class="mb-2")=strings.TITLE()
+                div(class="flex space-x-5")
+                    div(class="flex-grow")
+                        form(id="anc-side-effect-form" action=url + "/anc-side-effect?_method=PATCH" method="POST")
+                            input(id="anc-side-effect-input" class="form-control border rounded-xl px-4 w-full" type="text" name="anc_side_effect" value=anc_side_effect.value.title disabled)
+                    a(id="anc-side-effect-btn" class="btn btn-edit text-center" href=url + "/anc-side-effect" style="width: 100px;")=strings.EDIT()
+        div(id="anc-side-effect-btn-d" class="hidden")
+            button(id="anc-side-effect-save-btn" class="btn btn-primary rounded-full ml-auto" type="submit" form="anc-side-effect-form" style="width: 150px;")=strings.SAVE()
+
+    div.mb-8
+        p(class="font-bold text-xl mb-5")=strings.SIDE_EFFECT_RECORD_MANAGEMENT()
+        div(class="w-full bg-white rounded-2xl p-9 mb-8")
+            table(class="table table-auto w-full")
+                thead(class="border-b border-gray-200")
+                    tr
+                        th(style="text-align: center")
+                            button(class="sort-btn" data-name="survey_name" data-sort="ASC")
+                                div(class='flex space-x-2')
+                                    p(class="my-auto font-bold")=strings.SURVEY_NAME()
+                                    div(class="sort-d my-auto")
+                                        img(class="sort-up-img sort-img active" src="/assets/img/front-end/ic_sort_up.svg" alt="" style="width: 10px; height: 10px;") 
+                                        img(class="sort-down-img sort-img hidden" src="/assets/img/front-end/ic_sort_down.svg" alt="" style="width: 10px; height: 10px;")
+                        th(style="text-align: center")
+                            button(class="sort-btn" data-name="order" data-sort="ASC")
+                                div(class='flex space-x-2')
+                                    p(class="my-auto font-bold")=strings.SURVEY_NO()
+                                    div(class="sort-d my-auto")
+                                        img(class="sort-up-img sort-img" src="/assets/img/front-end/ic_sort_up.svg" alt="" style="width: 10px; height: 10px;") 
+                                        img(class="sort-down-img sort-img hidden" src="/assets/img/front-end/ic_sort_down.svg" alt="" style="width: 10px; height: 10px;")
+                        th(style="text-align: center")
+                            button(class="sort-btn" data-name="name" data-sort="ASC")
+                                div(class='flex space-x-2')
+                                    p(class="my-auto font-bold")=strings.SURVEY_Q_SHORT()
+                                    div(class="sort-d my-auto")
+                                        img(class="sort-up-img sort-img" src="/assets/img/front-end/ic_sort_up.svg" alt="" style="width: 10px; height: 10px;") 
+                                        img(class="sort-down-img sort-img hidden" src="/assets/img/front-end/ic_sort_down.svg" alt="" style="width: 10px; height: 10px;")
+                        th(style="width: 20%")=strings.ACTION()
+                tbody(id="body-list")
+                    each side_effect, index in side_effects
+                        tr
+                            td(style="text-align: center")= side_effect.survey.name
+                            td(style="text-align: center")= side_effect.order
+                            td(style="text-align: center")= side_effect.name
+                            td(class="flex space-x-3")
+                                a(class="action btn-edit" href=url + "/" + side_effect.id)=strings.EDIT()
+    div(id="pagination")!=pagination
+
+block js-script
+    script.
+      const url = !{JSON.stringify(url)};
+      const limit = !{JSON.stringify(limit)};
+      const totalCount = !{JSON.stringify(total_count)};
+      sortQuery = ['order', 'ASC'];
+
+      initializePagination(url, totalCount, limit, refreshSideEffect);
+      initializeSorting(url, refreshSideEffect);
+      
+      function refreshSideEffect(response){
+        $('#pagination').html(response.data.pagination);
+        initializePagination(url, totalCount, limit, refreshSideEffect);
+        
+        $('#body-list').html(response.data.side_effect_items);
+      }
+
+
+

@@ -1,0 +1,52 @@
+extends layoutNoticeFaq 
+
+block notice-faq-content
+    div(class="flex w-full mb-8")
+        div.mx-auto
+            a(class="btn btn-primary px-6 rounded-full" href=url + '/create')=strings.CREATE_NOTICE()
+
+    div(class="w-full bg-white rounded-2xl p-9 mb-8")
+        table(class="table table-auto w-full")
+            thead(class="border-b border-gray-200")
+                tr
+                    th
+                        button(class="sort-btn" data-name="created_at" data-sort="DESC")
+                            div(class='flex space-x-2')
+                                p(class="my-auto font-bold")=strings.CREATED_AT()
+                                div(class="sort-d my-auto")
+                                    img(class="sort-up-img sort-img" src="/assets/img/front-end/ic_sort_up.svg" alt="" style="width: 10px; height: 10px;") 
+                                    img(class="sort-down-img sort-img hidden" src="/assets/img/front-end/ic_sort_down.svg" alt="" style="width: 10px; height: 10px;")
+                    th
+                        button(class="sort-btn" data-name="title" data-sort="ASC")
+                            div(class='flex space-x-2')
+                                p(class="my-auto font-bold")=strings.NOTICE_TITLE()
+                                div(class="sort-d my-auto")
+                                    img(class="sort-up-img sort-img" src="/assets/img/front-end/ic_sort_up.svg" alt="" style="width: 10px; height: 10px;") 
+                                    img(class="sort-down-img sort-img hidden" src="/assets/img/front-end/ic_sort_down.svg" alt="" style="width: 10px; height: 10px;")
+                    th=strings.ACTION()
+            tbody(id="body-list")
+                each notice, index in notices
+                    tr
+                        td=moment(notice.created_at).format("YYYY-MM-DD")
+                        td=notice.title 
+                        td 
+                            a(class="action btn-primary" href=url + '/' + notice.id)=strings.DETAILS()
+
+    div(id="pagination")!=pagination
+
+block js-script
+    script.
+      var url = !{JSON.stringify(url)};
+      const limit = !{JSON.stringify(limit)};
+      const totalCount = !{JSON.stringify(total_count)};
+      sortQuery = ['created_at', 'DESC'];
+
+      initializePagination(url, totalCount, limit, refreshNotice);
+      initializeSorting(url, refreshNotice);
+
+      function refreshNotice(response){
+        $('#pagination').html(response.data.pagination);
+        initializePagination(url, totalCount, limit, refreshNotice);
+        
+        $('#body-list').html(response.data.notices_items);
+      }

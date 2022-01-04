@@ -1,0 +1,334 @@
+extends /app-management/layoutAppManagement
+block popup-content 
+    div(id="notif-detail-d")
+        p(id="push-notif-popup-title" class="text-center font-bold text-2xl mb-8")=strings.CREATE_PUSH()
+        form(id="push-notif-form" action=url + "?_method=PATCH" method="POST" enctype="multipart/form-data") 
+            div(id="push-notif-form-group" class="space-y-5 mb-8")
+                div(id="push-notif-created-date" class="hidden")
+                    p(class="mb-2")=strings.DATE()
+                    input(id="push-notif-date-input" class="form-control border rounded-xl px-4 w-full" name="date" type="text" disabled)
+                div
+                    p(class="mb-2")=strings.TITLE()
+                    input(id="push-notif-title-input" class="form-control border rounded-xl px-4 w-full" name="title" type="text" required)
+                div
+                    p(class="mb-2")=strings.IMAGE_OPTIONAL()
+                    div(class="flex")
+                        div(id="upload-image-d" class="flex")
+                            input(id="push-notif-image-input" class="hidden" name="image" type="file")
+                            label(for="push-notif-image-input" class="action btn-primary mr-3" style="width:100px")=strings.UPLOAD()
+                            p(class="my-auto")=strings.NO_IMAGE_SELECTED()
+                        div(id="preview-image-d" class="hidden w-full")
+                            img(class="mr-2" src="/assets/img/front-end/ic_attachment.svg" alt="")
+                            button(id="push-notif-image-name" class="text-left font-bold underline truncate mr-2" type="button") LoremIpsum.jpg
+                            button(id="push-notif-image-delete-btn" class="action btn-primary flex p-0 mt-auto mr-auto" type="button" style="min-width:21px; height:21px;") 
+                                img(class="m-auto" src="/assets/img/front-end/ic_times.svg" alt="" width="10" height="10")
+                div
+                    p(class="mb-2")=strings.LINK_OPTIONAL()
+                    input(id="push-notif-link-input" class="form-control border rounded-xl px-4 w-full" name="link" type="text")
+                div
+                    p(class="mb-2")=strings.DESCRIPTION()
+                    textarea(id="push-notif-description-input" class="border rounded-xl p-4 w-full" rows="3" name="description" required)
+                        
+                div(id="selected-user-count-d" class="flex justify-between")
+                    p(id="selected-user-count" class="font-bold my-auto")='0 ' + strings.USER_SELECTED()
+                    button(id="select-user-btn" class="action btn-primary px-4" type="button")=strings.SELECT_USER()
+                    
+        div(class="grid grid-cols-2 gap-6")
+            form(id="push-notif-delete-form" action=url method="POST")
+                button(id="delete_popup_btn" class="btn btn-danger text-center col-span-1 rounded-full w-full")=strings.DELETE()
+            button(id="save_popup_btn" class="btn btn-primary col-span-1 rounded-full w-full" type="submit" form="push-notif-form")=strings.SAVE()   
+            button(id="send_push_btn" class="btn btn-primary col-span-1 rounded-full hidden w-full" type="button")=strings.SEND_PUSH()
+            button(id="close_popup_btn" class="text-primary underline font-bold col-span-2 rounded-full mx-auto")=strings.CANCEL()
+
+    div(id="select-user-d" class="hidden")
+        div(class="flex relative mb-8")
+            div(class="absolute left-0")
+                button(id="select-user-back-btn" class="btn btn-back mr-4")
+                    img(src="/assets/img/front-end/ic_back.svg", alt="")
+            p(id="push-notif-popup-title" class="text-center font-bold text-2xl m-auto")=strings.SELECT_USER()
+        input(id="push-notif-title-input" class="form-control border rounded-xl px-4 w-full mb-4" name="title" type="text" placeholder="Search")
+        <!-- Select all toggle -->
+        div(class="flex")
+            div(class="flex ml-auto mb-4")
+                div(class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in")                
+                    input(id="select-all-user-toggle" type="checkbox" name="is_edit_anticancer_authority_enable" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer")
+                    label(for="select-all-user-toggle" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer")
+                p(class="my-auto")=strings.SELECT_ALL()
+        div(id="push-notif-user-list-d" class="border mb-8 overflow-auto" style="max-height: 250px;")
+            <!-- User list by js -->
+        button(id="select-user-done-btn" class="btn btn-primary w-full")=strings.DONE()
+            
+        
+
+block app-management-content
+    div(class="w-full bg-white rounded-2xl p-9 mb-8")
+        div(class="flex mb-8")
+            button(id="create-push-btn" class="btn btn-primary mx-auto px-14" href=url + "/create")=strings.CREATE_PUSH()
+        table(class="table table-auto w-full")
+            thead(class="border-b border-gray-200")
+                tr
+                    th(style="width: 15%")
+                        button(class="sort-btn" data-name="created_at" data-sort="ASC")
+                            div(class='flex space-x-2')
+                                p(class="my-auto font-bold")=strings.CREATED_AT()
+                                div(class="sort-d my-auto")
+                                    img(class="sort-up-img sort-img active" src="/assets/img/front-end/ic_sort_up.svg" alt="" style="width: 10px; height: 10px;") 
+                                    img(class="sort-down-img sort-img hidden" src="/assets/img/front-end/ic_sort_down.svg" alt="" style="width: 10px; height: 10px;")
+                    th
+                        button(class="sort-btn" data-name="id" data-sort="ASC")
+                            div(class='flex space-x-2')
+                                p(class="my-auto font-bold")=strings.PUSH_ID()
+                                div(class="sort-d my-auto")
+                                    img(class="sort-up-img sort-img" src="/assets/img/front-end/ic_sort_up.svg" alt="" style="width: 10px; height: 10px;") 
+                                    img(class="sort-down-img sort-img hidden" src="/assets/img/front-end/ic_sort_down.svg" alt="" style="width: 10px; height: 10px;")
+                    th
+                        button(class="sort-btn" data-name="title" data-sort="ASC")
+                            div(class='flex space-x-2')
+                                p(class="my-auto font-bold")=strings.TITLE()
+                                div(class="sort-d my-auto")
+                                    img(class="sort-up-img sort-img" src="/assets/img/front-end/ic_sort_up.svg" alt="" style="width: 10px; height: 10px;") 
+                                    img(class="sort-down-img sort-img hidden" src="/assets/img/front-end/ic_sort_down.svg" alt="" style="width: 10px; height: 10px;")
+                    th=strings.ACTION()
+            tbody(id="body-list")
+                each notification, index in notifications
+                    tr
+                        td= moment(notification.created_at).format('YYYY-MM-DD')
+                        td= notification.id
+                        td= notification.title
+                        td(class="flex space-x-3")
+                            button(class="push-notif-edit-btn action btn-primary" data-idx=index)=strings.DETAILS() 
+    div(id="pagination")!=pagination
+
+    script.
+        /// Constant for localization
+        const USER_SELECTED = !{JSON.stringify(strings.USER_SELECTED())};
+        const PUSH_NOTIFICATION_DETAIL = !{JSON.stringify(strings.PUSH_NOTIFICATION_DETAIL())};
+        const UPDATE_PUSH_NOTIFICATION = !{JSON.stringify(strings.UPDATE_PUSH_NOTIFICATION())};
+
+        /// Pass url to javascript client for delete push notif
+        url=!{JSON.stringify(url)};
+
+        /// Initialize notifications object on notifications variable
+        notifications=!{JSON.stringify(notifications)};
+
+        /// Initialize users for select user
+        users=!{JSON.stringify(users)};
+
+        /// Initialize user component 
+        const pushNotifUserComponent = !{JSON.stringify(push_notif_user_component)};
+
+        /// Selected user variable
+        var selectedUsers = [];
+
+        /// Selected user temporary variable when user component selected
+        var selectedUsersTemp = [];
+
+        /**
+            On image selected handler
+
+            After image push notif image selected do some function to preview the selected image
+        */
+        $('#push-notif-image-input').change(function() {
+            /// Get filename from selected image
+            let fileName = $('#push-notif-image-input')[0].files[0].name;
+
+            /// Change image preview name
+            $('#push-notif-image-name').text(fileName);
+
+            /// Toggle upload image section
+            toggleImageSection(true);
+        });
+
+        /**
+            On delete selected image handler
+
+            After image deleted, show upload image section
+        */
+        $('#push-notif-image-delete-btn').click(function() {
+            /// Toggle upload image section
+            toggleImageSection(false);
+        })
+
+        /**
+            Select user back button handler
+
+            Go back to notification form when user tap this button
+        */
+        $('#select-user-back-btn').on('click', function(){
+            /// Clear selected user temporary variable
+            selectedUsersTemp = [];
+
+            $('#notif-detail-d').removeClass('hidden');
+            $('#select-user-d').addClass('hidden');
+
+            $('#push-notif-user-list-d').empty();
+        });
+
+        /**
+            Select all user toggle handler
+        */
+        $('#select-all-user-toggle').on('change', function(){
+            const isChecked = $(this).is(':checked');
+
+            for(const [index, user] of users.entries()){
+                if (isChecked){
+                    /// Push all user id into selected users temp variable, when select all toggle is checked
+                    selectedUsersTemp.push(user.id);
+                }else{
+                    /// Clear selected users temp variable, when select all toggle is checked
+                    selectedUsersTemp = [];
+                }
+                /// Update user indicator
+                updateSelectedUserIndicator(index, user)
+            }
+        })
+
+        /**
+            Select user cell handler
+        */
+        $('#select-user-btn').on('click', function(){
+            /// Insert selected users variable into selected users temporary variable
+            selectedUsersTemp = JSON.parse(JSON.stringify(selectedUsers));
+
+            $('#notif-detail-d').addClass('hidden');
+            $('#select-user-d').removeClass('hidden');
+
+            for(const [index, user] of users.entries()){
+                const html = $(pushNotifUserComponent);
+                html.data('idx', index);
+                html.find('.user-name').text(user.name);
+                $('#push-notif-user-list-d').append(html);
+
+                /// Update user indicator
+                updateSelectedUserIndicator(index, user)
+            }
+
+            /// Select user handler
+            $('.user-btn').on('click', function(){
+                const index = $(this).data('idx');
+                const user = users[index];
+
+                if(selectedUsersTemp.includes(user.id)){
+                    selectedUsersTemp.splice(selectedUsersTemp.indexOf(user.id), 1);
+                    $('.selected-indicator').eq(index).addClass('hidden');
+                }else{
+                    selectedUsersTemp.push(user.id);
+                    $('.selected-indicator').eq(index).removeClass('hidden');
+                }
+
+                /// Update select all user toggler
+                updateSelectAllUserToggler();
+            })
+
+            /// Update select all user toggler
+            updateSelectAllUserToggler();
+        });
+
+        /**
+            Select user done button handler
+
+            Insert selected users temp variable into selected users variable, then update
+            the selected user count on notification form. After the process done then 
+            hide select user section, show notification form.
+        */
+        $('#select-user-done-btn').on('click', function(){
+            /// Insert selected users temporary variable into selected users variable
+            selectedUsers = JSON.parse(JSON.stringify(selectedUsersTemp));
+
+            /// Clear selected user temporary variable
+            selectedUsersTemp = [];
+
+            $('#selected-user-count').text(selectedUsers.length + ' ' + USER_SELECTED);
+            moveBackToNotificationForm();
+        })
+
+        $('#close_popup_btn').on("click" ,function(){
+            $('#popup_d').addClass('hidden');
+
+            resetPushNotifInput();
+            selectedUsers = [];
+        })
+
+        $('#send_push_btn').on("click" ,function(e){
+            console.log(selectedUsers);
+            for(selectedUser of selectedUsers){
+                $('<input>').attr({
+                    type: 'hidden',
+                    name: 'selected_users[]',
+                    value: selectedUser
+                }).appendTo($('#push-notif-form-group'));
+            }
+            $('#push-notif-form').submit();
+        });
+
+        /**
+        * Reset all push notif input to default
+        */
+        function resetPushNotifInput(){
+            $('#push-notif-title-input').val('');
+            $('#push-notif-link-input').val('');
+            $('#push-notif-description-input').val('');
+        }
+
+        function updateSelectedUserIndicator(index, user){
+            /// Update user indicator
+            if(selectedUsersTemp.includes(user.id)){
+                $('.selected-indicator').eq(index).removeClass('hidden');
+            }else{
+                $('.selected-indicator').eq(index).addClass('hidden');
+            }
+        }
+        function updateSelectAllUserToggler(){
+            $('#select-all-user-toggle').prop('checked', false);
+            /// Toggle select all user into checked, when all user selected 
+            if(selectedUsersTemp.length == users.length){
+                $('#select-all-user-toggle').prop('checked', true);
+            }
+        }
+
+        /**
+            Move back to notifiation form
+            
+            Hide select user section, then show notif form section
+        */
+        function moveBackToNotificationForm(){
+            $('#notif-detail-d').removeClass('hidden');
+            $('#select-user-d').addClass('hidden');
+
+            $('#push-notif-user-list-d').empty();
+        }
+
+        /**
+            Toggle for upload image & preview image
+
+            * Params: 
+                - isSelected: Parameter to specify image selected or not
+        */
+        function toggleImageSection(isSelected){
+            /// Hide upload image section
+            $('#upload-image-d').removeClass((isSelected) ? 'flex' : 'hidden');
+            $('#upload-image-d').addClass((isSelected) ? 'hidden' : 'flex');
+            
+            /// Show preview image section
+            $('#preview-image-d').removeClass((isSelected) ? 'hidden' : 'flex');
+            $('#preview-image-d').addClass((isSelected) ? 'flex' : 'hidden');
+        }
+
+    <!-- Pagination Javascripts -->
+    script.
+        var url = !{JSON.stringify(url)};
+        const limit = !{JSON.stringify(limit)};
+        const totalCount = !{JSON.stringify(total_count)};
+        sortQuery = ['id', 'DESC'];
+
+        initializePagination(url, totalCount, limit, refreshPushNotif);
+        initializeSorting(url, refreshPushNotif);
+
+        function refreshPushNotif(response){
+            $('#pagination').html(response.data.pagination);
+            initializePagination(url, totalCount, limit, refreshPushNotif);
+            
+            $('#body-list').html(response.data.push_notif_items);
+        }
+
+

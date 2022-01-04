@@ -1,0 +1,195 @@
+extends /layout_dashboard
+
+block dashboard-content
+    div(class="relative w-full mb-8")
+        div(class="flex")
+            a(class="btn btn-back mr-4" href="/app-management/survey-management")
+                img(src="/assets/img/front-end/ic_back.svg", alt="")
+            p(class="my-auto")=strings.SURVEY_MANAGEMENT()
+        p(class="font-bold my-auto centered-axis-x" style="top:3.5px;")=title
+    form(action=url + ((survey) ? '?_method=PATCH' : '') method="POST")
+        div(class="w-full bg-white rounded-2xl p-9 mb-8")
+            div(class="mb-4")
+                p(class="mb-2")=strings.SURVEY_KIND()
+                input(class="form-control border rounded-xl px-4 w-full" type="text" name="survey_name" value=(survey) ? survey.name : '' required)
+        <!-- Side Effects Section -->
+        div(id="survey-side-effect-d")
+
+        <!-- Add Side Effect Section -->
+        div(class="flex")
+            button(id="push-survey-side-effect-btn" class="btn btn-primary mx-auto" type="button" style="width: 150px;") +
+        
+        div(class="flex w-full")
+            div.ml-auto
+                button(id="save-btn" class="btn btn-primary w-36 rounded-full" type="submit" disabled=(survey))=strings.SAVE() 
+block js-script
+    - if(typeof(survey) !== 'undefined')
+        script.
+            const survey = !{JSON.stringify(survey)};
+
+    script.
+        var totalSideEffect = 0;
+        const surveySideEffectComponent = !{JSON.stringify(survey_side_effect_component)};
+        const surveyQuestionComponent = !{JSON.stringify(survey_question_component)};
+
+        function initializeSideEffectSection(html, totalSideEffect){
+            html.find('.survey-question-order').text(String(totalSideEffect + 1).padStart(2, '0'));
+            html.find('.survey-question-add-btn').data("idx", totalSideEffect);
+            html.find('.survey-q-short-input').attr("name", "side_effects["+ totalSideEffect +"][name]");
+        }
+       
+        if(typeof(survey) !== 'undefined'){
+            for(const [index, sideEffect] of survey.side_effects.entries()){
+                const html = $(surveySideEffectComponent);
+                initializeSideEffectSection(html, totalSideEffect);
+                
+                totalSideEffect++;
+
+                $('<input>').attr({
+                    type: 'hidden',
+                    name: 'side_effects[' + index + '][id]',
+                    value: sideEffect.id
+                }).insertBefore(html.find('.survey-q-short-input'));
+
+                html.find('.survey-q-short-input').val(sideEffect.name);
+                $('#survey-side-effect-d').append(html);
+
+                for(const [questionIdx, surveyQuestion] of sideEffect.survey_questions.entries()){
+                    const html = $(surveyQuestionComponent);
+                    html.find('.survey_answer_sub_type_input').val(surveyQuestion.survey_answer_sub_type_id);
+                    html.find('.survey-question-input').val(surveyQuestion.question);
+
+                    html.find('.survey-question-delete-btn').data('parent-idx', index);
+                    html.find('.survey-question-delete-btn').attr('data-idx', questionIdx);
+
+                    $('<input>').attr({
+                        type: 'hidden',
+                        name: 'side_effects[' + index + '][survey_questions][' + questionIdx + '][id]',
+                        value: surveyQuestion.id
+                    }).insertBefore(html.find('.survey-question-input'));
+                    html.find('.survey-question-input').attr('name', 'side_effects['+ index +'][survey_questions]['+ questionIdx +'][question]');
+                    html.find('.survey_answer_sub_type_input').attr('name', 'side_effects['+ index +'][survey_questions]['+ questionIdx +'][survey_answer_sub_type_id]');
+                    
+                    $('.survey-questions-d').eq(index).append(html);
+                }
+
+                initializeSurveyQuestionDeleteBtn();
+            }   
+        }else{
+            totalSideEffect++;
+            $('#survey-side-effect-d').append($.parseHTML(surveySideEffectComponent));
+        }
+
+        initializeQuestionBtn();
+
+        $('#push-survey-side-effect-btn').on('click', function(){
+            const html = $(surveySideEffectComponent);
+            initializeSideEffectSection(html, totalSideEffect);
+            $('#survey-side-effect-d').append(html);
+
+            totalSideEffect++;
+
+            initializeQuestionBtn();
+        });
+
+        function initializeQuestionBtn(){
+            $('.side-effect-delete-btn').unbind();
+            $('.side-effect-delete-btn').on('click', function(){
+                const index = $(this).data('idx');
+                $('.survey-side-effect-d').eq(index).remove();
+
+                totalSideEffect--;
+                rearrangeOrder();
+
+                enableSaveBtn();
+            })
+
+            $('.survey-question-add-btn').unbind();
+            $('.survey-question-add-btn').on('click', function(){
+                const html = $(surveyQuestionComponent);
+                const index = $(this).data('idx');
+                const totalQuestion = $('.survey-questions-d').eq(index).find('.survey-question-d').length;
+
+                html.find('.survey-question-delete-btn').data('parent-idx', index);
+                html.find('.survey-question-delete-btn').attr('data-idx', totalQuestion);
+
+                html.find('.survey-question-input').attr('name', 'side_effects['+ index +'][survey_questions]['+ totalQuestion +'][question]');
+                html.find('.survey_answer_sub_type_input').attr('name', 'side_effects['+ index +'][survey_questions]['+ totalQuestion +'][survey_answer_sub_type_id]');
+                $('.survey-questions-d').eq(index).append(html);
+
+                initializeSurveyQuestionDeleteBtn();
+            });
+        }
+
+        function initializeSurveyQuestionDeleteBtn(){
+            $('.survey-question-delete-btn').unbind();
+            $('.survey-question-delete-btn').on('click', function(){
+                const parentIndex = $(this).data('parent-idx');
+                const index = $(this).data('idx');
+                $('.survey-side-effect-d').eq(parentIndex).find('.survey-question-d').eq(index).remove();
+                rearrageQuestion(parentIndex);
+
+                enableSaveBtn();
+            });
+        }
+
+        function rearrageQuestion(parentIndex){
+            console.log("RearrageQuestion");
+            var index = 0;
+            const surveyQuestions = $('.survey-side-effect-d').eq(parentIndex).find('.survey-question-d');
+
+            var questionIdx = 0;
+            for (const surveyQuestion of surveyQuestions){
+                $(surveyQuestion).find('.survey-question-input').attr('name', 'side_effects['+ index +'][survey_questions]['+ questionIdx +'][question]');
+                $(surveyQuestion).find('.survey_answer_sub_type_input').attr('name', 'side_effects['+ index +'][survey_questions]['+ questionIdx +'][survey_answer_sub_type_id]');
+
+                $(surveyQuestion).find('.survey-question-delete-btn').data('idx', index);
+                questionIdx++;
+                index++;
+            }
+            
+        }
+
+        function rearrangeOrder(){
+            var index = 0;
+            const surveySideEffects = $('.survey-side-effect-d');
+            for (const surveySideEffect of surveySideEffects){
+                /// Update side effect order numbering
+                $(surveySideEffect).find('.survey-question-order').text(String(index + 1).padStart(2, '0'))
+
+                 /// Update the survey question add button index for identifier
+                $(surveySideEffect).find('.survey-question-add-btn').data('idx', index);
+
+                /// Get all survey question container section element
+                const surveyQuestions = $('.survey-questions-d').eq(index).find('.survey-question-d');
+
+                var questionIdx = 0;
+                for (const surveyQuestion of surveyQuestions){
+                    $(surveyQuestion).find('.survey-question-input').attr('name', 'side_effects['+ index +'][survey_questions]['+ questionIdx +'][question]');
+                    $(surveyQuestion).find('.survey_answer_sub_type_input').attr('name', 'side_effects['+ index +'][survey_questions]['+ questionIdx +'][survey_answer_sub_type_id]');
+                    /// Update the survey question button parent-idx
+                    $(surveyQuestion).find('.survey-question-delete-btn').data('parent-idx', index)
+                    questionIdx++;
+                }
+                index++;
+            }
+
+            index = 0;
+            const sideEffectDeleteBtns = $('.side-effect-delete-btn');
+            for (const sideEffectDeleteBtn of sideEffectDeleteBtns){
+                $(sideEffectDeleteBtn).data('parent-idx', index++)
+            }
+        }
+
+        $('input[type="text"]').on('input', function(){
+            enableSaveBtn();
+        })
+
+        $('select').on('change', function(){
+            enableSaveBtn();
+        })
+
+        function enableSaveBtn(){
+            $('#save-btn').attr('disabled', false);
+        }
+    

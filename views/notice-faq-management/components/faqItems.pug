@@ -1,0 +1,5 @@
+each faq, index in faqs
+    tr
+        td(style="text-align: center")=faq.question
+        td 
+            a(class="action btn-primary" href=url + '/' + faq.id)=strings.DETAILS()

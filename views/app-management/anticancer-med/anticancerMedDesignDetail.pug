@@ -1,0 +1,42 @@
+extends /layout_dashboard
+
+block dashboard-content
+    +alert(response)
+    
+    div(class="relative w-full mb-8")
+        div(class="flex")
+            a(class="btn btn-back mr-4" href="/app-management/anticancer-med-management")
+                img(src="/assets/img/front-end/ic_back.svg", alt="")
+            p(class="my-auto")=strings.ANTICANCER_MED_MANAGEMENT()
+        p(class="font-bold my-auto centered-axis-x" style="top:3.5px;")=title
+
+    div(class="w-full bg-white rounded-2xl p-9 mb-8")
+        form(id="anticancer-med-design-form" action=url + '?_method=PATCH' method="POST")
+            table(class="table table-auto whitespace-nowrap w-full")
+                thead(class="border-b border-gray-200")
+                    tr
+                        th(class="text-center" style="width: 30%")=strings.NO()
+                        th(class="text-center" style="width: 30%")=strings.NAME()
+                        th(class="text-center" style="width: 30%")=strings.HEXCODE()
+                tbody
+                    - const anticancerMedDesignElements = anticancer_med.anticancer_med_design.anticancer_med_design_elements
+                    each anticancer_med_design_element, index in anticancerMedDesignElements
+                        tr 
+                            td(class="text-center")=(index + 1)
+                            td(class="text-center")
+                                - if(index < 2 || index == (anticancerMedDesignElements.length - 1))
+                                    p=anticancer_med_design_element.name
+                                - else
+                                    input(class="injection-route-date-input form-control text-center border rounded-xl px-4" name="anticancer_med_design_elements["+ index +"][name]" type="text" value=anticancer_med_design_element.name required)
+                            td(class="text-center")
+                                input(class="injection-route-date-input form-control text-center border rounded-xl px-4" name="anticancer_med_design_elements["+ index +"][color_hex]" type="text" value=anticancer_med_design_element.color_hex required)
+                            input(name="anticancer_med_design_elements["+ index +"][id]" type="hidden" value=anticancer_med_design_element.id)
+    div(class="flex")
+        button(id="save-btn" class="btn btn-primary w-36 rounded-full ml-auto" type="submit" form="anticancer-med-design-form" disabled)=strings.SAVE()
+block js-script
+    script.
+        $('input[type="text"]').on('input', function(){
+            $('#save-btn').attr('disabled', false);
+        })
+        
+        

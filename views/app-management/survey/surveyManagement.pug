@@ -1,0 +1,63 @@
+extends ../layoutAppManagement
+
+block app-management-content
+    div(class="flex mb-8")
+        a(id="create-push-btn" class="btn btn-primary mx-auto px-14" href=url + "/create")=strings.CREATE_SURVEY()  
+    div(class="w-full bg-white rounded-2xl p-9 mb-8")
+        table(class="table table-auto w-full")
+            thead(class="border-b border-gray-200")
+                tr
+                    th=strings.SURVEY_KIND()
+                    th=strings.SURVEY_COUNT()
+                    th=strings.SEVERITY_COUNT()
+                    th=strings.FREQUENCY_COUNT()
+                    th=strings.DAILY_LIFE_COUNT()
+                    th=strings.YES_NO_COUNT()
+                    th=strings.ACTION()
+            tbody(id="body-list")
+                each survey, index in surveys
+                    - var surveyCount = 0
+                    - var severityCount = 0
+                    - var frequencyCount = 0
+                    - var dailyLifeCount = 0
+                    - var yesNoCount = 0
+                    each side_effect, index in survey.side_effects
+                        each survey_question, index in side_effect.survey_questions
+                            - surveyCount = surveyCount + 1;
+                            case survey_question.survey_answer_sub_type.survey_answer_type.name
+                                when '심각도'
+                                    - severityCount = severityCount + 1;
+                                when '빈도'
+                                    - frequencyCount = frequencyCount + 1;
+                                when '일상생활 영향'
+                                    - dailyLifeCount = dailyLifeCount + 1;
+                                when '이상유무'
+                                    - yesNoCount = yesNoCount + 1;
+                    tr
+                        td=survey.name
+                        td=surveyCount
+                        td=severityCount
+                        td=frequencyCount
+                        td=dailyLifeCount
+                        td=yesNoCount
+                        td(class="flex space-x-3")
+                            a(class="action btn-primary" href=url + '/' + survey.id)=strings.DETAILS()
+                        
+    div(id="pagination")!=pagination
+
+block js-script
+    script.
+        var url = !{JSON.stringify(url)};
+        const limit = !{JSON.stringify(limit)};
+        const totalCount = !{JSON.stringify(total_count)};
+
+        initializePagination(url, totalCount, limit, refreshSurvey);
+      
+        function refreshSurvey(response){
+            $('#pagination').html(response.data.pagination);
+            initializePagination(url, totalCount, limit, refreshSurvey);
+            
+            $('#body-list').html(response.data.survey_items);
+        }
+            
+

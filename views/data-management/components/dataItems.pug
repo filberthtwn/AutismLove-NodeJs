@@ -1,0 +1,16 @@
+each user in users
+    - const lastInjectionRoute = user.injection_routes[user.injection_routes.length-1];
+    tr 
+    td=moment(user.created_at).format('YYYY-MM-DD')
+    td= user.email
+    td= user.name
+    td= user.phone_number
+    td= user.anticancer_med.name
+    td
+        
+        - if(lastInjectionRoute && lastInjectionRoute.side_effect_records.length > 0 && lastInjectionRoute.side_effect_records[0].survey_records.length > 0)
+            = lastInjectionRoute.anticancer_med_design_element.name + ' ' + lastInjectionRoute.side_effect_records[0].survey_records[0].week + '주차'
+        - else
+            = '-'
+    td
+        a(class="action btn-primary" href="data-management/" + user.id + "/route")=strings.DETAILS()

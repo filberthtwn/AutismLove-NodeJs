@@ -1,0 +1,18 @@
+extends layout
+
+block layout-content
+  div(class="flex bg-bgPrimary w-screen h-screen")
+    div(class="m-auto p-10 bg-white rounded-lg" style="width: 500px;")
+      div(class="")
+        +alert(response)
+        img(class="mx-auto mb-4" src="./assets/img/front-end/img_logo.png" alt="" style="width: 150px")
+        form(action="/login" method="POST") 
+          div(class="mb-8")
+            div(class="mb-4 border-b-2 border-primary")
+              p(class="text-sm text-muted")=strings.ID()
+              input(class="form-control align-bottom border-0 w-full" placeholder="ID" name="email"  style="border-radius: 0px;")
+            div(class="mb-4 border-b-2 border-primary")
+              p(class="text-sm text-muted")=strings.PASSWORD()
+              input(type="password" class="form-control align-bottom border-0 w-full" placeholder="Password" name="password" style="border-radius: 0px;")
+          button(class="btn bg-primary rounded-md text-white w-full" href="/")=strings.LOGIN()
+        

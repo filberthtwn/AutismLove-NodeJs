@@ -1,0 +1,27 @@
+extends layout
+
+block layout-content
+    div(id="popup_d" class="fixed inset-0 z-50 hidden")
+        div(class="absolute inset-0 bg-opacity-50 bg-black")
+        div(id="popup-d-content" class="m-auto bg-white z-50 p-12 rounded-lg overflow-y-auto" style="width: 500px; max-height: 90%;")
+            block popup-content 
+    div(class="p-12 border-r-2 h-screen fixed" style="width: 300px") 
+        img(class="mb-8" src="/assets/img/front-end/img_logo.png" alt="" width="175px")
+        div(class="")
+            a(href="/user-management")
+                div(class="flex nav-link w-full p-6 rounded-lg drop-shadow" class={ active: path == '/user-management' })
+                    p(class="text-base")=strings.USER_MANAGEMENT()
+            a(href="/data-management")
+                div(class="flex nav-link w-full p-6 rounded-lg drop-shadow" class={ active: path == '/data-management' })
+                    p(class="text-base")=strings.DATA_MANAGEMENT()
+            a(href="/notice-faq-management/notice") 
+                div(class="flex nav-link w-full p-6 rounded-lg drop-shadow" class={ active: path == '/notice-faq-management' })
+                    p(class="text-base")=strings.NOTICE_FAQ()
+            a(href="/app-management/anticancer-med-management") 
+                div(class="flex nav-link w-full p-6 rounded-lg drop-shadow" class={ active: path == '/app-management' })
+                    p(class="text-base")=strings.APP_MANAGEMENT()
+            a(href="/logout") 
+                div(class="flex nav-link w-full p-6 rounded-lg drop-shadow")
+                    p(class="text-base")=strings.LOGOUT()
+    div(class="wrapper")
+        block dashboard-content         

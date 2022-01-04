@@ -1,0 +1,70 @@
+extends layoutDataDetail 
+
+include components/userSection
+
+block data-detail-content
+    +userSection(user)
+    
+    div(class="flex mb-8")
+        a(class="btn btn-excel px-5 ml-auto" href=url + '/download-excel')
+            div(class="flex")
+                img(class="mr-4" src="/assets/img/front-end/ic_excel.svg")
+                p=strings.EXCEL_DOWNLOAD()
+
+    div(class="w-full bg-white rounded-2xl p-9 mb-8")
+        form(id="injection-route-form" action=url + "?_method=PATCH" method="POST")
+            table(class="table table-auto w-full")
+                thead(class="border-b border-gray-200")
+                    tr
+                        th(style="text-align: center") 순번
+                        th(style="text-align: center")=strings.ROUTE_NAME_02()
+                        th(class="text-center" style="text-align: center; width: 30%")=strings.DATE()
+                        th(style="text-align: center")=strings.STATUS()
+                        //- th(style="text-align: center")=strings.ACTION()
+                tbody(class="")
+                    each injection_route, index in user.injection_routes
+                        if injection_route.status == 'ON_GOING'
+                            - var onGoingRouteIdx = index
+                        tr 
+                            td(class="text-center")= injection_route.anticancer_med_design_element.order + 1
+                            td(class="text-center")= injection_route.anticancer_med_design_element.name
+                            td(class="text-center" style="width: 30%") 
+                                if injection_route.status == 'IN_COMING'
+                                    div(class="flex" style="height:50px;")
+                                        p(class="m-auto") -
+                                else 
+                                    input(name="injection_routes["+ index +"][id]" type="hidden" value=injection_route.id)
+                                    input(class="injection-route-date-input form-control text-center border rounded-xl px-4" name="injection_routes["+ index +"][date]" type="text" style="width: 200px;" placeholder="-" required readOnly)
+                            td(class="text-center" style="width: 20%")= injection_route.status
+                            //- td(class="text-center" style="width: 20%")
+                            //-     button(class="update-injection-route-btn action btn-edit" data-idx=index disabled=(index > onGoingRouteIdx + 1))=strings.EDIT()
+    div(class="flex")
+        button(id="save-btn" class="btn btn-primary w-36 rounded-full ml-auto" type="submit" form="injection-route-form" disabled)=strings.SAVE()
+
+block js-script
+    script(src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js")
+    script.
+        injectionRoutes=!{JSON.stringify(user.injection_routes)};
+
+        var datePickers = [];
+        const lastIndex = injectionRoutes.findIndex((e) => e.status == 'ON_GOING');
+
+        $('.injection-route-date-input').each(function(index, val){
+            const options = {
+                formatter: (input, date, instance) => {
+                    const value = moment(date).format('YYYY-MM-DD');
+                    input.value = value
+                },
+                onSelect: (instance, date) => {
+                    $('#save-btn').attr('disabled', false);
+                },
+            };
+
+            if (injectionRoutes[index].date) {
+                options.dateSelected = new Date(injectionRoutes[index].date);
+            }
+
+            datepicker(val, options);
+        });
+        
+        

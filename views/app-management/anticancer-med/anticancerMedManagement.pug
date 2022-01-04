@@ -1,0 +1,112 @@
+extends ../layoutAppManagement
+
+block app-management-content
+    div(class="w-full bg-white rounded-2xl p-9 mb-8")
+        table(class="table table-auto w-full")
+            thead(class="border-b border-gray-200")
+                tr
+                    th=strings.ANTICANCER_MED_TYPE()
+                    th=strings.ANTICANCER_MED_DESIGN_TYPE()
+                    th=strings.ANTICANCER_MED_DESIGN_NO()
+                    th=strings.ACTION()
+            tbody(class="")
+                each anticancer_med, index in anticancer_meds
+                    if(anticancer_med.identifier != 'I_DONT_KNOW')
+                        tr
+                            td= anticancer_med.name
+                            td= anticancer_med.anticancer_med_design.name
+                            td= anticancer_med.anticancer_med_design.anticancer_med_design_elements.length
+                            td(class="flex space-x-3")
+                                button(class="edit-anticancerMed-btn action btn-edit" data-idx=index)=strings.EDIT()
+
+    div(id="update-anticancerMed-d" class="hidden")
+        form(id="update-anticancerMed-form" action="" method="POST")
+            div(class="w-full bg-white rounded-2xl p-9 mb-8")
+                div(class="grid grid-cols-2 gap-8 mb-8")
+                    div(class="col-span-1") 
+                        p(class="mb-2")=strings.ANTICANCER_MED_TYPE()
+                        input(id="anticancerMed-name-input" class="form-control border rounded-xl px-4 w-full" type="text" disabled)
+                    div(class="col-span-1") 
+                        div(class="flex space-x-4")
+                            div(class="flex-grow")
+                                p(class="mb-2")=strings.ANTICANCER_MED_DESIGN_NO()
+                                input(id="anticancerMed-element-total-input" class="form-control border rounded-xl px-4 w-full" type="text" disabled)
+                            a(id="anticancerMed-design-edit-btn" class="btn btn-edit mt-auto text-center" href=url + "/" style="width: 100px;")=strings.EDIT()
+
+                    div(class="col-span-2") 
+                        p(class="mb-2")=strings.SURVEY_KIND()
+                        div(class="form-control custom-select")
+                            select(id="anticancerMed-survey-input" class="h-full w-full" name="survey_id")
+                                option(value='') None
+                                each survey in surveys
+                                    option(value=survey.id)=survey.name
+                    div(class="col-span-2") 
+                        p(class="mb-2")=strings.DESCRIPTION()
+                        textarea(id="anticancerMed-desc-input" class="hidden" name="description")
+                        div(id="anticancerMed-description-editor" class="form-control border rounded-xl px-0" style="height:250px;")
+                    div(class="col-span-1") 
+                        p(class="mb-2")=strings.ANTICANCER_RECORD_BG_COLOR()
+                            input(id="anticancerMed-record-bg-color-input" class="form-control border rounded-xl px-4 w-full"
+                            name="record_bg_color" type="text")
+                    div(class="col-span-1") 
+                        p(class="mb-2")=strings.ANTICANCER_RECORD_TABLE_COLOR()
+                            input(id="anticancerMed-record-table-color-input" class="form-control border rounded-xl px-4 w-full" name="record_table_color" type="text")
+
+        div(class="flex")
+            button(id="save-btn" class="btn btn-primary ml-auto px-14" type="submit" form="update-anticancerMed-form" disabled)=strings.SAVE()
+
+block js-script
+    script.
+        url=!{JSON.stringify(url)};
+        anticancerMeds=!{JSON.stringify(anticancer_meds)};
+        
+        const quill = new Quill('#anticancerMed-description-editor', {
+            //- theme: 'snow',
+            "modules": {
+                "toolbar": false
+            }
+        });
+
+        quill.on('text-change', function(delta, oldDelta, source) {
+           enableSaveBtn();
+        });
+
+        $('#update-anticancerMed-form').on("submit", function(){
+            $('#anticancerMed-desc-input').val($('#anticancerMed-description-editor .ql-editor').html());
+        });
+
+        $('.edit-anticancerMed-btn').on("click", function(){
+            const index = $(this).data('idx');
+            const anticancerMed = anticancerMeds[index];
+
+            $('#anticancerMed-name-input').val(anticancerMed.name);
+            $('#anticancerMed-element-total-input').val(anticancerMed.anticancer_med_design.anticancer_med_design_elements.length);
+            $('#anticancerMed-survey-input').val(anticancerMed.survey_id);
+            $('#anticancerMed-desc-input').val(anticancerMed.description);
+
+            $('#anticancerMed-record-bg-color-input').val(anticancerMed.record_bg_color);
+            $('#anticancerMed-record-table-color-input').val(anticancerMed.record_table_color);
+
+            $('#anticancerMed-design-edit-btn').attr('href', url + '/' + anticancerMed.id + '/design');
+
+            $('#update-anticancerMed-form').attr('action', 'anticancer-med-management/' + anticancerMed.id + "?_method=PATCH");
+            $('#update-anticancerMed-d').removeClass('hidden');
+
+            $('#anticancerMed-description-editor .ql-editor').html(anticancerMed.description);
+
+            $('#save-btn').attr('disabled', true);
+        });
+
+        $('input[type="text"]').on('input', function(){
+            enableSaveBtn();
+        })
+
+        $('select').on('change', function(){
+            enableSaveBtn();
+        })
+
+        function enableSaveBtn(){
+            $('#save-btn').attr('disabled', false);
+        }
+            
+

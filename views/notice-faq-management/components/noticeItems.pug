@@ -1,0 +1,6 @@
+each notice, index in notices
+    tr
+        td=moment(notice.created_at).format("YYYY-MM-DD")
+        td=notice.title 
+        td 
+            a(class="action btn-primary" href=url + '/' + notice.id)=strings.DETAILS()

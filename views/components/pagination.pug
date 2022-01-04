@@ -1,0 +1,36 @@
+div(class="flex mt-6")
+    div(class="flex space-x-3 ml-auto")
+        button(id="prev-page-btn" class="flex rounded-full bg-white shadow" style="width: 35px; height: 35px;")
+            img(class="m-auto" src="/assets/img/front-end/ic_chevron_left.svg", alt="")
+        div(class="flex rounded-full bg-white shadow px-6" style="height: 35px; background-color: red;")
+            div(class="flex my-auto")
+                - if (Math.round(total_count) <= 6)
+                    - if(Math.round(total_count) > 0)
+                        - for (var i = 1; i < Math.round(total_count) + 1; ++i)
+                            button(class="page-btn rounded-full" class=(current_page == i) ? "active" : "" data-page=i style="min-width: 24px; height: 24px;")=i
+                    - else
+                         button(class="page-btn active rounded-full" data-page=1 style="min-width: 24px; height: 24px;")=1
+                - else
+                    - if (current_page < 4)
+                        - for (var i = 1; i <= 4; ++i)
+                            button(class="page-btn rounded-full" class=(current_page == i) ? "active" : "" data-page=i style="min-width: 24px; height: 24px;")=i
+                        p(class="page-separator text-center" style="width: 24px;")="..."   
+                        button(class="page-btn rounded-full" data-page=Math.round(total_count) style="min-width: 24px; height: 24px;")=Math.round(total_count)
+
+                    - else if (current_page > Math.round(total_count) - 3)
+                        button(class="page-btn rounded-full" data-page=1 style="min-width: 24px; height: 24px;")=1
+                        p(class="page-separator text-center" style="width: 24px;")="..."   
+                        - for (var i = Math.round(total_count) - 3; i <= Math.round(total_count); ++i)
+                            button(class="page-btn rounded-full" class=(current_page == i) ? "active" : "" data-page=i style="min-width: 24px; height: 24px;")=i
+
+                    - else
+                        button(class="page-btn rounded-full" data-page=1 style="min-width: 24px; height: 24px;") 1
+                        p(class="page-separator text-center" style="width: 24px;")="..."
+                        button(class="page-btn rounded-full" data-page=current_page-1 style="min-width: 24px; height: 24px;")=current_page - 1
+                        button(class="page-btn rounded-full" class="active" data-page=current_page style="min-width: 24px; height: 24px;")=current_page
+                        button(class="page-btn rounded-full" data-page=current_page+1 style="min-width: 24px; height: 24px;")=current_page + 1   
+                        p(class="page-separator text-center" style="width: 24px;")="..."
+                        button(class="page-btn rounded-full" data-page=Math.round(total_count) style="min-width: 24px; height: 24px;")=Math.round(total_count)
+        button(id="next-page-btn" class="rounded-full bg-white shadow" style="width: 35px; height: 35px; background-color: red;")
+            img(class="m-auto" src="/assets/img/front-end/ic_chevron_right.svg", alt="")
+    

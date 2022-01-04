@@ -1,0 +1,112 @@
+extends /layout_dashboard
+
+block dashboard-content
+    div(class="relative w-full mb-8")
+        div(class="flex")
+            a(class="btn btn-back mr-4" href="/app-management/side-effect-management")
+                img(src="/assets/img/front-end/ic_back.svg", alt="")
+            p(class="my-auto")=strings.SIDE_EFFECT_MANAGEMENT()
+        p(class="font-bold my-auto centered-axis-x" style="top:3.5px;")=strings.ANC_SIDE_EFFECT_MANAGEMENT()
+
+    div(class="w-full bg-white rounded-2xl p-9 mb-8")
+        form(id="anc-side-effect-form" action=url + "?_method=PATCH" method="POST") 
+            div(class="mb-4")
+                p(class="mb-2")=strings.TITLE()
+                input(class="form-control border rounded-xl px-4 w-full" type="text" name="title" required value=anc_side_effect.value.title)
+            div
+                p(class="mb-2")=strings.DESCRIPTION()
+                textarea(id="anc-side-effect-description-input" class="hidden" name="description")
+                div(id="anc-side-effect-description-editor" style="height:250px;")!= anc_side_effect.value.description
+    
+    div(class="flex w-full")
+        div.ml-auto
+            if url.split("/")[url.split("/").length - 1] != 'create'
+                form(class="inline-block" action=url + "?_method=DELETE"  method="POST")
+                    button(class="btn btn-danger w-36 rounded-full mr-6")=strings.DELETE()
+            button(id="save-btn" class="btn btn-primary w-36 rounded-full" type="submit" form="anc-side-effect-form" disabled)=strings.SAVE() 
+
+block js-script
+    script.
+        const url = !{JSON.stringify(url)};
+
+        const toolbarOptions = [
+            ['bold', 'italic', 'underline', 'strike'],
+            [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+            [{ 'indent': '-1'}, { 'indent': '+1' }],
+            [{ 'direction': 'rtl' }],
+            [{ 'size': ['small', false, 'large', 'huge'] }], 
+            [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+            [{ 'color': [] }, { 'background': [] }],
+            [{ 'align': [] }],
+            ['link', 'image']
+        ];
+
+        const quill = new Quill('#anc-side-effect-description-editor', {
+            theme: 'snow',
+            modules: {
+                toolbar: toolbarOptions
+            },
+        });
+
+        $('#anc-side-effect-form').on("submit", function(){
+            $('#anc-side-effect-description-input').val($('#anc-side-effect-description-editor .ql-editor').html());
+        });
+
+        const toolbar = quill.getModule('toolbar').addHandler('image', () => {
+            selectLocalImage();
+        });
+
+        $('input[type="text"]').on('input', function(){
+            enableSaveBtn();
+        })
+
+        quill.on('text-change', function(delta, oldDelta, source) {
+           enableSaveBtn();
+        });
+
+        function selectLocalImage() {
+            const input = document.createElement('input');
+            input.setAttribute('type', 'file');
+            input.click();
+
+            // Listen upload local image and save to server
+            input.onchange = () => {
+                const file = input.files[0];
+
+                // file type is only image.
+                if (/^image\//.test(file.type)) {
+                    saveToServer(file);
+                } else {
+                console.warn('You could only upload images.');
+                }
+            };
+        }
+
+        function saveToServer(image){
+            const formData = new FormData()
+            formData.append('image', image)
+
+            $.ajax({
+                type: 'POST',
+                url: url + '/upload-image',
+                data: formData,
+                cache: false,
+                contentType: false,
+                processData: false,
+                success: function(response){
+                    insertToEditor(response.link);
+                },
+                error: function(request, status, error){
+                    alert(request.responseText);
+                }
+            });
+        };
+
+        function insertToEditor(url) {
+            const range = quill.getSelection();
+            quill.insertEmbed(range.index, 'image', url);
+        }
+
+        function enableSaveBtn(){
+            $('#save-btn').attr('disabled', false);
+        }

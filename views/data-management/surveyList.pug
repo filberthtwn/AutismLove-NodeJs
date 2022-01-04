@@ -1,0 +1,143 @@
+extends layoutDataDetail 
+
+include components/userSection
+
+block popup-content
+    - if(injection_routes.length > 0)
+        - var surveyRecords = injection_routes[injection_routes.length - 1].side_effect_records[0].survey_records
+        - var lastSurveyDate = ''
+        - if(injection_routes[injection_routes.length - 1].id  && surveyRecords.length <= 4)
+            - lastSurveyDate = surveyRecords[surveyRecords.length - 1].expected_date
+        p=surveyRecords[surveyRecords.length - 1].expected_date
+
+        div(id="alarm-date-setting-d" class="hidden")
+            form(action=url + '/alarm-date-setting?_method=PATCH' method="POST")
+                p(class="text-center mb-4") !{strings.ALARM_SETTING_DESC()}
+                input(id="alarm-date-input" class="form-control border rounded-xl px-4 mb-4 w-full" name="last_survey_date" type="text" value=lastSurveyDate readOnly)
+                div(class="grid grid-flow-col grid-cols-2 gap-3 w-full")
+                    button(id="close_popup_btn" class="btn btn-danger rounded-full" type="button")=strings.CANCEL()
+                    button(id="alarm-date-save-btn" class="btn btn-primary rounded-full" type="submit")=strings.SAVE()
+        div(id="survey-duration-setting-d" class="")
+            form(action=url + '/survey-duration?_method=PATCH' method="POST")
+                p(class="text-center mb-4") !{strings.SURVEY_DURATION_SETTING_DESC()}
+                input(id="survey-duration-input" class="form-control border rounded-xl px-4 mb-4 w-full" name="survey_duration" type="text" value=user.survey_duration required)
+                div(class="grid grid-flow-col grid-cols-2 gap-3 w-full")
+                    button(id="survey-duration-popu-close-btn" class="btn btn-danger rounded-full" type="button")=strings.CANCEL()
+                    button(id="survey-duration-btn" class="btn btn-primary rounded-full" type="submit")=strings.SAVE()
+            
+
+block data-detail-content
+    +userSection(user)
+
+    //- - const surveyRecords = injection_routes[injection_routes.length - 1].side_effect_records[0].survey_records
+    //- - var lastSurveyDate = ''
+
+    //- - if(injection_routes[injection_routes.length - 1].id != last_injection_route.id && surveyRecords.length <= 4)
+    //-     - lastSurveyDate = surveyRecords[surveyRecords.length - 1].survey_date
+    
+    div(class="flex mb-6 w-full")
+        button(id="alarm-date-setting-btn" class="btn btn-primary mr-5 px-5")=strings.ALARM_DATE_SETTING()
+        button(id="survey-duration-setting-btn" class="btn btn-primary px-5")=strings.CREATE_DURATION_SET()
+        div(class="flex ml-auto my-auto")
+            div(class="my-auto mr-3")
+                form(id="alarm-setting-form" action=url + '/alarm-setting?_method=PATCH' method="POST")
+                    input(type="hidden" name="is_alarm_on" value="ini test")
+                    div(class="flex")
+                        p(class="my-auto mr-3")=strings.ALARM_SETTING()
+                        div(class="relative my-auto inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in")       
+                            input(type="checkbox" id="alarm-setting-toggle" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer" checked=(user.is_alarm_on == true))
+                            label(for="alarm-setting-toggle" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer")
+            div(class="flex")
+                a(class="btn btn-excel px-5 ml-auto" href=url + '/download-excel')
+                    div(class="flex")
+                        img(class="mr-4" src="/assets/img/front-end/ic_excel.svg")
+                        p=strings.EXCEL_DOWNLOAD()
+
+    div(class="w-full bg-white rounded-2xl overflow-x-hidden p-9 mb-8")
+        div(class="px-5 overflow-x-auto")
+            table(class="table table-auto whitespace-nowrap w-full")
+                thead(class="border-b border-gray-200")
+                    tr
+                        th=strings.ROUTE_NAME()
+                        th=strings.INJECTION_DATE()
+                        th=strings.SURVEY_EXPECTED_DATE() 
+                        th=strings.CONDITION() 
+                        if(user.anticancer_med.survey)
+                            each side_effect, index in user.anticancer_med.survey.side_effects
+                                each survey_question, index in side_effect.survey_questions
+                                    th=strings.SURVEY() + ' ' + side_effect.name + ' - ' + survey_question.survey_answer_sub_type.survey_answer_type.name
+                tbody
+                    each injection_route, index in injection_routes
+                        - const sideEffectRecords = injection_route.side_effect_records[0]
+                            each survey_record, index in sideEffectRecords.survey_records
+                                - if(survey_record.survey_answer_records.length > 0)
+                                    tr 
+                                        td=injection_route.anticancer_med_design_element.name + ' - ' + survey_record.week
+                                        td=injection_route.date
+                                        td=survey_record.expected_date
+                                        - if (survey_record.survey_answer_records.length == 0)
+                                            - if(currentDate > survey_record.expected_date)
+                                                td="Passed"
+                                            - else 
+                                                td="Created"
+                                        - else if (survey_record.survey_answer_records.length > 0)
+                                            td="Surveyed"
+                                                
+                                        each side_effect, index in user.anticancer_med.survey.side_effects
+                                            each survey_question, index in side_effect.survey_questions
+                                                each side_effect_record, index in injection_route.side_effect_records
+                                                    if (side_effect_record.side_effect_id == side_effect.id)
+                                                        each survey_record_y, index in side_effect_record.survey_records
+                                                            if(survey_record_y.week == survey_record.week)
+                                                                each survey_answer_record, index in survey_record_y.survey_answer_records
+                                                                    if(survey_answer_record.survey_question.survey_answer_sub_type.survey_answer_type_id == survey_question.survey_answer_sub_type.survey_answer_type_id)
+                                                                        td=survey_answer_record.survey_answer_option.answer
+                    - if(injection_routes.length > 0)
+                        - if(injection_routes[injection_routes.length - 1].id != last_injection_route.id && surveyRecords.length <= 4)
+                            tr 
+                                td -
+                                td -
+                                td=moment(new Date(lastSurveyDate)).format('YYYY-MM-DD')
+                                td="Expecting"
+                                        
+                                
+
+block js-script
+    script(src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js")
+    script(type="text/javascript").
+        const lastSurveyDate = !{JSON.stringify(lastSurveyDate)};
+
+        $('#alarm-date-setting-btn').on("click", function(){
+            $('#alarm-date-setting-d').removeClass('hidden');
+            $('#survey-duration-setting-d').addClass('hidden');
+            
+            $('#popup_d').addClass('flex');
+            $('#popup_d').removeClass('hidden');
+            $('#popup-d-content').removeClass('overflow-y-auto');
+        });
+
+        $('#survey-duration-setting-btn').on("click", function(){
+            $('#alarm-date-setting-d').addClass('hidden');
+            $('#survey-duration-setting-d').removeClass('hidden');
+
+            $('#popup_d').addClass('flex');
+            $('#popup_d').removeClass('hidden');
+        });
+
+        $('#survey-duration-popu-close-btn').on("click", function(){
+            $('#popup_d').addClass('hidden');
+            $('#popup_d').removeClass('flex');
+        });
+        
+        $('#alarm-setting-toggle').on('change', function(){
+            $('input[name="is_alarm_on"]').val($(this).is(":checked"));
+            $('#alarm-setting-form').submit();
+        })
+
+        datepicker('#alarm-date-input', {
+            formatter: (input, date, instance) => {
+                const value = moment(date).format('YYYY-MM-DD');
+                input.value = value
+            },
+            dateSelected: new Date(lastSurveyDate),
+        })

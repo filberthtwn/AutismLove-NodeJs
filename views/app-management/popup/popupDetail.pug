@@ -1,0 +1,163 @@
+extends /layout_dashboard
+
+block dashboard-content
+    div(class="relative w-full mb-8")
+        div(class="flex")
+            a(class="btn btn-back mr-4" href="/app-management/popup-management")
+                img(src="/assets/img/front-end/ic_back.svg", alt="")
+            p(class="my-auto")=strings.POPUP_MANAGEMENT()
+        p(class="font-bold my-auto centered-axis-x" style="top:3.5px;")=title
+
+    div(class="w-full bg-white rounded-2xl p-9 mb-8")
+        form(id="side-effect-form" action=url + ((popup) ? "?_method=PATCH" : "") method="POST" enctype="multipart/form-data") 
+            div(class="grid grid-cols-2 gap-8 mb-8")
+                div(class="col-span-2") 
+                    p(class="mb-2")=strings.TITLE()
+                    input(class="form-control border rounded-xl px-4 w-full" name="title" type="text" value=(popup) ? popup.title : '' required)
+                div(class="col-span-1") 
+                    p(class="mb-2")=strings.EXPOSE_START_DATE()
+                    input(id="popup_start_date_input" class="form-control border rounded-xl px-4 w-full" name="start_date" type="text" required readOnly)
+                div(class="col-span-1") 
+                    p(class="mb-2")=strings.EXPOSE_END_DATE()
+                    input(id="popup_end_date_input" class="form-control border rounded-xl px-4 w-full" name="end_date" type="text" required readOnly)
+                div(class="col-span-1") 
+                    p(class="mb-2")=strings.START_TIME()
+                    input(id="start_time_input" class="form-control border rounded-xl px-4 w-full" name="start_time" type="text" value="00:00" required readOnly)
+                div(class="col-span-1") 
+                    p(class="mb-2")=strings.END_TIME()
+                    input(id="end_time_input" class="form-control border rounded-xl px-4 w-full" name="end_time" type="text" value="00:00" required readOnly)
+                div(class="col-span-2") 
+                    p(class="mb-2")=strings.POPUP_TYPE()
+                    div(class="form-control custom-select")
+                        select(id="popup-type-input" class="h-full w-full" name="popup_type")
+                            option(value="IMAGE" selected=(popup) ? (popup.popup_type == 'IMAGE') : true)=strings.IMAGE()
+                            option(value="TEXT" selected=(popup) ? (popup.popup_type == 'TEXT') : false)=strings.TEXT()
+                div(id="popup-type-image-input-d" class="col-span-2") 
+                    p(class="mb-2")=strings.IMAGE()
+                    div(id="upload-image-d" class=(popup) ? ((popup.popup_type == 'IMAGE') ? 'hidden' : 'flex') : 'flex')
+                        input(id="popup-image-input" class="hidden" name="image" type="file")
+                        label(for="popup-image-input" class="action btn-primary mr-3" style="width:100px")=strings.UPLOAD()
+                        p(class="my-auto")=strings.NO_IMAGE_SELECTED()
+                    div(id="preview-image-d" class="w-full" class=(popup) ? ((popup.popup_type == 'IMAGE') ? 'flex' : 'hidden') : 'hidden')
+                        img(class="mr-2" src="/assets/img/front-end/ic_attachment.svg" alt="")
+                        button(id="popup-image-name" class="text-left font-bold underline truncate mr-2" type="button")=(popup && popup.image_url != null) ? popup.image_url.split('/')[popup.image_url.split('/').length - 1] : 'imageName'
+                        button(id="popup-image-delete-btn" class="action btn-primary flex p-0 mt-auto mr-auto" type="button" style="min-width:21px; height:21px;") 
+                            img(class="m-auto" src="/assets/img/front-end/ic_times.svg" alt="" width="10" height="10")
+                div(id="popup-type-text-input-d" class="col-span-2 hidden")
+                    p(class="mb-2") Text
+                    input(id="popup-text-input" class="form-control border rounded-xl px-4 w-full" name="text" type="text" value=(popup) ? popup.text : '')
+                div(class="col-span-2") 
+                    p(class="mb-2")=strings.BUTTON_TYPE()
+                    div(class="form-control custom-select")
+                        select(id="popup-button-type-input" class="h-full w-full" name="button_type")
+                            option(value="SHOW_ONLY" selected=(popup) ? (popup.button_type == 'SHOW_ONLY') : true)=strings.SHOW_ONLY()
+                            option(value="LINK" selected=(popup) ? (popup.button_type == 'LINK') : false)=strings.LINK()
+                div(id="popup-link-input-d" class="col-span-2 hidden")
+                    p(class="mb-2")=strings.LINK()
+                    input(id="birthYear-input" class="form-control border rounded-xl px-4 w-full" name="link" type="text" value=(popup) ? popup.link : '')
+    
+    div(class="flex w-full")
+        div.ml-auto
+            if url.split("/")[url.split("/").length - 1] != 'create'
+                form(class="inline-block" action=url + "?_method=DELETE" method="POST")
+                    button(class="btn btn-danger w-36 rounded-full mr-6")=strings.DELETE()
+            button(id="save-btn" class="btn btn-primary w-36 rounded-full" type="submit" form="side-effect-form" disabled=(popup))=strings.SAVE()
+            
+block js-script
+    - if (typeof(popup) !== 'undefined'){
+        script.
+            popup=!{JSON.stringify(popup)};
+    - }
+    script(src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js")
+    script.
+        $('#start_time_input').clockpicker();
+        $('#end_time_input').clockpicker();
+
+        if(typeof(popup) !== 'undefined'){
+            /// Show popup link section when popup button type is 'LINK'
+            if (popup.button_type == 'LINK'){
+                $('#popup-link-input-d').removeClass('hidden');
+            }
+        }
+
+        //- $('.clockpicker').clockpicker();
+
+        /**
+            On image selected handler
+
+            After image popupimage selected do some function to preview the selected image
+        */
+        $('#popup-image-input').change(function() {
+            /// Get filename from selected image
+            let fileName = $('#popup-image-input')[0].files[0].name;
+
+            /// Change image preview name
+            $('#popup-image-name').text(fileName);
+
+            enableSaveBtn();
+
+            /// Toggle upload image section
+            toggleImageSection(true);
+        });
+
+        /**
+            On delete selected image handler
+
+            After image deleted, show upload image section
+        */
+        $('#popup-image-delete-btn').click(function() {
+            enableSaveBtn();
+            
+            /// Toggle upload image section
+            toggleImageSection(false);
+        })
+
+        /**
+            Toggle for upload image & preview image
+
+            * Params: 
+                - isSelected: Parameter to specify image selected or not
+        */
+        function toggleImageSection(isSelected){
+            /// Hide upload image section
+            $('#upload-image-d').removeClass((isSelected) ? 'flex' : 'hidden');
+            $('#upload-image-d').addClass((isSelected) ? 'hidden' : 'flex');
+            
+            /// Show preview image section
+            $('#preview-image-d').removeClass((isSelected) ? 'hidden' : 'flex');
+            $('#preview-image-d').addClass((isSelected) ? 'flex' : 'hidden');
+        }
+
+        $('input[type="text"]').on('input', function(){
+            enableSaveBtn();
+        })
+
+        $('select').on('change', function(){
+            enableSaveBtn();
+        })
+
+        datepicker('#popup_start_date_input', {
+            formatter: (input, date, instance) => {
+                const value = moment(date).format('YYYY-MM-DD');
+                input.value = value
+            },
+            dateSelected: (typeof popup !== "undefined") ? new Date(popup.start_date) : new Date(),
+            onSelect: (instance, date) => {
+                enableSaveBtn();
+            }
+        })
+
+        datepicker('#popup_end_date_input', {
+            formatter: (input, date, instance) => {
+                const value = moment(date).format('YYYY-MM-DD');
+                input.value = value
+            },
+            dateSelected: (typeof popup !== "undefined") ? new Date(popup.end_date) : new Date(),
+            onSelect: (instance, date) => {
+                enableSaveBtn();
+            }
+        })
+
+        function enableSaveBtn(){
+            $('#save-btn').attr('disabled', false);
+        }
